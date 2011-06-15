@@ -522,7 +522,7 @@
 	 * @param elementPosition
 	 *     The mouse position relative to the specified element
 	 */
-	function Simulation($element, elementPosition, moveMode) {
+	function Simulation($element, elementPosition) {
 		Simulator.apply(this);
 		
 		/**
@@ -1083,7 +1083,9 @@
 			options = {};
 		}
 		this.press($element);
+		this.wait(5);
 		this.release(this.$element);
+		this.wait(5);
 		this.mouseclick(
 			this.$element,
 			$.extend(
