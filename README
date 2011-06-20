@@ -13,7 +13,7 @@ How do I use it?:
 	Most likely, you will only need $.simula.Simulation and its methods:
 	
 		// create a new Simulation
-		var simulation = $.simula.Simulation($("#someElement"), [0, 0]);
+		var simulation = new $.simula.Simulation($("#someElement"), [0, 0]);
 		// build execution chain
 		simulation.move([10, 15]).click($("#someButton"));
 		// execute
