@@ -285,9 +285,18 @@
 	 */
 	Simulator.prototype.execute = function() {
 		if (this.isRunning()) {
-			throw new Error("SimulatorQueue is already running");
+			throw new Error("Simulator is already running");
 		}
 		this.running = true;
+	};
+	/**
+	 * Finishes the simulation even if its running. Doesn't do anything if not.
+	 */
+	Simulator.prototype.stop = function() {
+		if (this.isRunning()) {
+			this.running = false;
+			this.updateObservers("stop");
+		}
 	};
 	/**
 	 * Checks if it is running.
@@ -321,30 +330,44 @@
 	SimulatorQueue.prototype = new Simulator();
 	SimulatorQueue.prototype.constructor = SimulatorQueue;
 	SimulatorQueue.prototype.updateObservable = function(observable, args) {
-		if (args != "finish"
-			|| this.currentIndex < 0
+		if (args != "finish" || this.currentIndex < 0
 			|| this.currentIndex >= this.simulators.length
 			|| observable != this.simulators[this.currentIndex]) {
 			return;
 		}
 		var simulator = this.simulators[this.currentIndex];
 		simulator.removeObserver(this);
-		this.proceed();
+		if (this.currentIndex <  this.simulators.length - 1) {
+			this.proceed();
+		} else {
+			this.finish();
+		}
+	};
+	SimulatorQueue.prototype.finish = function() {
+		this.currentIndex = -1;
+		Simulator.prototype.finish.apply(this);
 	};
 	SimulatorQueue.prototype.execute = function() {
 		Simulator.prototype.execute.apply(this);
-		this.proceed();
+		if (this.simulators.length > 0) {
+			this.proceed();
+		} else {
+			this.finish();
+		}
+	};
+	SimulatorQueue.prototype.stop = function() {
+		if (this.isRunning()) {
+			var simulator = this.simulators[this.currentIndex];
+			simulator.stop();
+			this.currentIndex = -1;
+		}
+		Simulator.prototype.stop.apply(this);
 	};
 	/**
 	 * Proceeds with the execution of the next Simulator.
 	 */
 	SimulatorQueue.prototype.proceed = function() {
 		this.currentIndex++;
-		if (this.currentIndex == this.simulators.length) {
-			this.currentIndex = -1;
-			this.finish();
-			return;
-		}
 		var simulator = this.simulators[this.currentIndex];
 		simulator.addObserver(this);
 		simulator.execute();
@@ -363,18 +386,24 @@
 		 * The amount of milliseconds to wait before the Observers are updated.
 		 */
 		this.time = time;
+		/**
+		 * The id of the timeout.
+		 */
+		 this.timeoutId = null;
 	}
 	TimeSimulator.prototype = new Simulator();
 	TimeSimulator.prototype.constructor = TimeSimulator;
 	TimeSimulator.prototype.execute = function() {
 		Simulator.prototype.execute.apply(this);
-		var self = this;
-		setTimeout(
-			function() {
-				self.finish();
-			},
-			this.time
-		);
+		this.timeoutId = setTimeout($.proxy(function() {
+			this.finish();
+		}, this), this.time);
+	};
+	TimeSimulator.prototype.stop = function() {
+		if (this.isRunning()) {
+			clearTimeout(this.timeoutId);
+		}
+		Simulator.prototype.stop.apply(this);
 	};
 	
 	/**
@@ -453,10 +482,9 @@
 	EventSimulator.prototype.execute = function() {
 		Simulator.prototype.execute.apply(this);
 		this.event = this.buildEvent();
-		var self = this;
-		this.listener = function(event) {
-			self.handleEvent(event);
-		};
+		this.listener = $.proxy(function(event) {
+			this.handleEvent(event);
+		}, this);
 		this.addEventListener();
 		this.dispatchEvent();
 	};

@@ -134,22 +134,63 @@ describe("jquery.maenulabs.simula", function() {
 			observer = new $.simula.Observer();
 			simulator = new $.simula.Simulator();
 		});
+		
+		afterEach(function() {
+			simulator.stop();
+		});
+		
+		describe("execute", function() {
 			
-		it("should update its Observers on execute then finish", function() {
-			spyOn(simulator, "finish").andCallThrough();
-			spyOn(observer, "updateObservable").andCallThrough();
-			simulator.addObserver(observer);
-			expect(simulator.isRunning()).toBeFalsy();
-			expect(simulator.finish).not.toHaveBeenCalled();
-			expect(observer.updateObservable).not.toHaveBeenCalled();
-			simulator.execute();
-			expect(simulator.isRunning()).toBeTruthy();
-			expect(simulator.finish).not.toHaveBeenCalled();
-			expect(observer.updateObservable).not.toHaveBeenCalled();
-			simulator.finish();
-			expect(simulator.isRunning()).toBeFalsy();
-			expect(simulator.finish).toHaveBeenCalled();
-			expect(observer.updateObservable).toHaveBeenCalledWith(simulator, "finish");
+			it("should update its Observers on execute then finish", function() {
+				spyOn(simulator, "finish").andCallThrough();
+				spyOn(observer, "updateObservable").andCallThrough();
+				simulator.addObserver(observer);
+				expect(simulator.isRunning()).toBeFalsy();
+				expect(simulator.finish).not.toHaveBeenCalled();
+				expect(observer.updateObservable).not.toHaveBeenCalled();
+				simulator.execute();
+				expect(simulator.isRunning()).toBeTruthy();
+				expect(simulator.finish).not.toHaveBeenCalled();
+				expect(observer.updateObservable).not.toHaveBeenCalled();
+				simulator.finish();
+				expect(simulator.isRunning()).toBeFalsy();
+				expect(simulator.finish).toHaveBeenCalled();
+				expect(observer.updateObservable).toHaveBeenCalledWith(simulator, "finish");
+			});
+			
+			it("should throw an error when trying to execute while running", function() {
+				spyOn(simulator, "finish").andCallThrough();
+				simulator.execute();
+				expect(function(){
+					simulator.execute();
+				}).toThrow(new Error("Simulator is already running"));
+			});
+			
+		});
+		
+		describe("stop", function() {
+			
+			it("should do nothing if not running", function() {
+				spyOn(observer, "updateObservable").andCallThrough();
+				simulator.addObserver(observer);
+				expect(simulator.isRunning()).toBeFalsy();
+				expect(observer.updateObservable).not.toHaveBeenCalled();
+				simulator.stop();
+				expect(simulator.isRunning()).toBeFalsy();
+				expect(observer.updateObservable).not.toHaveBeenCalled();
+			});
+			
+			it("should update with stop if running", function() {
+				spyOn(observer, "updateObservable").andCallThrough();
+				simulator.addObserver(observer);
+				simulator.running = true;
+				expect(simulator.isRunning()).toBeTruthy();
+				expect(observer.updateObservable).not.toHaveBeenCalled();
+				simulator.stop();
+				expect(simulator.isRunning()).toBeFalsy();
+				expect(observer.updateObservable).toHaveBeenCalledWith(simulator, "stop");
+			});
+			
 		});
 		
 	});
@@ -157,9 +198,14 @@ describe("jquery.maenulabs.simula", function() {
 	describe("simula.TimeSimulator", function() {
 		
 		var timeSimulator;
+		var beforeExecution;
 		
 		beforeEach(function() {
 			timeSimulator = new $.simula.TimeSimulator(50);
+		});
+		
+		afterEach(function() {
+			timeSimulator.stop();
 		});
 		
 		it("should finish after the interval", function() {
@@ -167,17 +213,37 @@ describe("jquery.maenulabs.simula", function() {
 				spyOn(timeSimulator, "finish").andCallThrough();
 				expect(timeSimulator.finish).not.toHaveBeenCalled();
 				expect(timeSimulator.isRunning()).toBeFalsy();
+				beforeExecution = new Date();
 				timeSimulator.execute();
-			});
-			waits(5);
-			runs(function() {
 				expect(timeSimulator.finish).not.toHaveBeenCalled();
 				expect(timeSimulator.isRunning()).toBeTruthy();
 			});
-			waits(50);
+			waitsFor(function() {
+				return timeSimulator.finish.callCount == 1;
+			}, "finish to be called", 100);
 			runs(function() {
+				expect((new Date()).getTime() - beforeExecution.getTime()).toBeGreaterThan(40);
 				expect(timeSimulator.finish).toHaveBeenCalled();
 				expect(timeSimulator.isRunning()).toBeFalsy();
+			});
+		});
+			
+		it("should clear the interval on stop", function() {
+			runs(function() {
+				this.observer = new $.simula.Observer();
+				spyOn(this.observer, "updateObservable").andCallThrough();
+				timeSimulator.addObserver(this.observer);
+				timeSimulator.execute();
+				expect(timeSimulator.isRunning()).toBeTruthy();
+				expect(this.observer.updateObservable).not.toHaveBeenCalled();
+				timeSimulator.stop();
+				expect(timeSimulator.isRunning()).toBeFalsy();
+				expect(this.observer.updateObservable).toHaveBeenCalledWith(timeSimulator, "stop");
+				this.observer.updateObservable.reset();
+			});
+			waits(200);
+			runs(function() {
+				expect(this.observer.updateObservable).not.toHaveBeenCalled();
 			});
 		});
 		
@@ -191,16 +257,35 @@ describe("jquery.maenulabs.simula", function() {
 		TestSimulator.prototype = new $.simula.Simulator();
 		TestSimulator.prototype.constructor = TestSimulator;
 		TestSimulator.prototype.execute = function() {
+			beforeExecution = new Date();
 			$.simula.Simulator.prototype.execute.apply(this);
 			this.finish();
 		};
 		
+		function TestTimeSimulator(id, time) {
+			$.simula.TimeSimulator.apply(this, [time]);
+			
+			this.id = id;
+		}
+		TestTimeSimulator.prototype = new $.simula.TimeSimulator();
+		TestTimeSimulator.prototype.constructor = TestTimeSimulator;
+		TestTimeSimulator.prototype.execute = function() {
+			beforeExecution[this.id] = new Date();
+			$.simula.TimeSimulator.prototype.execute.apply(this);
+		};
+		
 		var observer;
 		var simulatorQueue;
+		var beforeExecution;
 		
 		beforeEach(function() {
 			observer = new $.simula.Observer();
 			simulatorQueue = new $.simula.SimulatorQueue([]);
+			beforeExecution = {};
+		});
+		
+		afterEach(function() {
+			simulatorQueue.stop();
 		});
 		
 		describe("empty SimulatorQueue", function() {
@@ -307,17 +392,45 @@ describe("jquery.maenulabs.simula", function() {
 			
 		});
 		
-		describe("interceptions should not affect execution", function() {
+		describe("asynchronous execution", function() {
 			
 			var simulator1;
 			var simulator2;
 			var simulator3;
 			
 			beforeEach(function() {
-				simulator1 = new $.simula.TimeSimulator(50);
-				simulator2 = new $.simula.TimeSimulator(50);
-				simulator3 = new $.simula.TimeSimulator(50);
+				simulator1 = new TestTimeSimulator("simulator1", 50);
+				simulator2 = new TestTimeSimulator("simulator2", 50);
+				simulator3 = new TestTimeSimulator("simulator3", 50);
 				simulatorQueue = new $.simula.SimulatorQueue([simulator1, simulator2, simulator3]);
+			});
+			
+			it("should clear the interval on stop", function() {
+				runs(function() {
+					this.observer = new $.simula.Observer();
+					spyOn(this.observer, "updateObservable").andCallThrough();
+					simulatorQueue.addObserver(this.observer);
+					spyOn(simulator1, "execute").andCallThrough();
+					spyOn(simulator1, "finish").andCallThrough();
+					spyOn(simulator2, "execute").andCallThrough();
+					spyOn(simulator3, "execute").andCallThrough();
+					simulatorQueue.execute();
+					expect(simulatorQueue.isRunning()).toBeTruthy();
+					expect(simulator1.execute).toHaveBeenCalled();
+					expect(simulator1.finish).not.toHaveBeenCalled();
+					expect(this.observer.updateObservable).not.toHaveBeenCalled();
+					simulatorQueue.stop();
+					expect(simulatorQueue.isRunning()).toBeFalsy();
+					expect(this.observer.updateObservable).toHaveBeenCalledWith(simulatorQueue, "stop");
+					this.observer.updateObservable.reset();
+				});
+				waits(500);
+				runs(function() {
+					expect(simulator1.finish).not.toHaveBeenCalled();
+					expect(simulator2.execute).not.toHaveBeenCalled();
+					expect(simulator3.execute).not.toHaveBeenCalled();
+					expect(this.observer.updateObservable).not.toHaveBeenCalled();
+				});
 			});
 			
 			it("should execute one after another", function() {
@@ -334,9 +447,6 @@ describe("jquery.maenulabs.simula", function() {
 					expect(simulatorQueue.observers).toContain(observer);
 					expect(simulatorQueue.isRunning()).toBeFalsy();
 					simulatorQueue.execute();
-				});
-				waits(10);
-				runs(function() {
 					expect(simulatorQueue.isRunning()).toBeTruthy();
 					expect(simulator1.execute).toHaveBeenCalled();
 					expect(simulator1.finish).not.toHaveBeenCalled();
@@ -347,8 +457,11 @@ describe("jquery.maenulabs.simula", function() {
 					expect(simulatorQueue.finish).not.toHaveBeenCalled();
 					expect(observer.updateObservable).not.toHaveBeenCalled();
 				});
-				waits(45);
+				waitsFor(function() {
+					return simulator1.finish.callCount == 1;
+				}, "step 1 to finish", 100);
 				runs(function() {
+					expect((new Date()).getTime() - beforeExecution[simulator1.id].getTime()).toBeGreaterThan(40);
 					expect(simulatorQueue.isRunning()).toBeTruthy();
 					expect(simulator1.execute).toHaveBeenCalled();
 					expect(simulator1.finish).toHaveBeenCalled();
@@ -359,8 +472,11 @@ describe("jquery.maenulabs.simula", function() {
 					expect(simulatorQueue.finish).not.toHaveBeenCalled();
 					expect(observer.updateObservable).not.toHaveBeenCalled();
 				});
-				waits(55);
+				waitsFor(function() {
+					return simulator2.finish.callCount == 1;
+				}, "step 2 to finish", 100);
 				runs(function() {
+					expect((new Date()).getTime() - beforeExecution[simulator2.id].getTime()).toBeGreaterThan(40);
 					expect(simulatorQueue.isRunning()).toBeTruthy();
 					expect(simulator1.execute).toHaveBeenCalled();
 					expect(simulator1.finish).toHaveBeenCalled();
@@ -371,8 +487,11 @@ describe("jquery.maenulabs.simula", function() {
 					expect(simulatorQueue.finish).not.toHaveBeenCalled();
 					expect(observer.updateObservable).not.toHaveBeenCalled();
 				});
-				waits(55);
+				waitsFor(function() {
+					return simulator3.finish.callCount == 1;
+				}, "step 3 to finish", 100);
 				runs(function() {
+					expect((new Date()).getTime() - beforeExecution[simulator3.id].getTime()).toBeGreaterThan(40);
 					expect(simulatorQueue.isRunning()).toBeFalsy();
 					expect(simulator1.execute).toHaveBeenCalled();
 					expect(simulator1.finish).toHaveBeenCalled();
@@ -388,10 +507,16 @@ describe("jquery.maenulabs.simula", function() {
 			it("should work to rerun the queue", function() {
 				runs(function() {
 					spyOn(simulatorQueue, "finish").andCallThrough();
+					beforeExecution = new Date();
 					simulatorQueue.execute();
 				});
-				waits(165);
+				waitsFor(function() {
+					return simulatorQueue.finish.callCount == 1;
+				}, "queue to finish", 300);
 				runs(function() {
+					expect(((new Date()).getTime() - beforeExecution[simulator1.id].getTime())
+						+ ((new Date()).getTime() - beforeExecution[simulator2.id].getTime())
+						+ ((new Date()).getTime() - beforeExecution[simulator3.id].getTime())).toBeGreaterThan(140);
 					expect(simulatorQueue.finish).toHaveBeenCalled();
 					simulatorQueue.finish.reset();
 					spyOn(simulator1, "finish").andCallThrough();
@@ -400,33 +525,38 @@ describe("jquery.maenulabs.simula", function() {
 					expect(simulatorQueue.isRunning()).toBeFalsy();
 					simulatorQueue.execute();
 					expect(simulatorQueue.isRunning()).toBeTruthy();
-				});
-				waits(10);
-				runs(function() {
-					expect(simulatorQueue.isRunning()).toBeTruthy();
 					expect(simulator1.finish).not.toHaveBeenCalled();
 					expect(simulator2.finish).not.toHaveBeenCalled();
 					expect(simulator3.finish).not.toHaveBeenCalled();
 					expect(simulatorQueue.finish).not.toHaveBeenCalled();
 				});
-				waits(45);
+				waitsFor(function() {
+					return simulator1.finish.callCount == 1;
+				}, "step 1 to finish", 100);
 				runs(function() {
+					expect((new Date()).getTime() - beforeExecution[simulator1.id].getTime()).toBeGreaterThan(40);
 					expect(simulatorQueue.isRunning()).toBeTruthy();
 					expect(simulator1.finish).toHaveBeenCalled();
 					expect(simulator2.finish).not.toHaveBeenCalled();
 					expect(simulator3.finish).not.toHaveBeenCalled();
 					expect(simulatorQueue.finish).not.toHaveBeenCalled();
 				});
-				waits(55);
+				waitsFor(function() {
+					return simulator2.finish.callCount == 1;
+				}, "step 2 to finish", 100);
 				runs(function() {
+					expect((new Date()).getTime() - beforeExecution[simulator2.id].getTime()).toBeGreaterThan(40);
 					expect(simulatorQueue.isRunning()).toBeTruthy();
 					expect(simulator1.finish).toHaveBeenCalled();
 					expect(simulator2.finish).toHaveBeenCalled();
 					expect(simulator3.finish).not.toHaveBeenCalled();
 					expect(simulatorQueue.finish).not.toHaveBeenCalled();
 				});
-				waits(55);
+				waitsFor(function() {
+					return simulator3.finish.callCount == 1;
+				}, "step 3 to finish", 100);
 				runs(function() {
+					expect((new Date()).getTime() - beforeExecution[simulator3.id].getTime()).toBeGreaterThan(40);
 					expect(simulatorQueue.isRunning()).toBeFalsy();
 					expect(simulator1.finish).toHaveBeenCalled();
 					expect(simulator2.finish).toHaveBeenCalled();
@@ -438,23 +568,30 @@ describe("jquery.maenulabs.simula", function() {
 			it("should not care about unrelated updates", function() {
 				runs(function() {
 					spyOn(simulatorQueue, "finish").andCallThrough();
+					spyOn(simulator1, "finish").andCallThrough();
+					spyOn(simulator2, "finish").andCallThrough();
+					spyOn(simulator3, "finish").andCallThrough();
+					beforeExecution = new Date();
 					simulatorQueue.execute();
-				});
-				waits(55);
-				runs(function() {
 					simulatorQueue.updateObservable(simulator1, "somthing else");
 					expect(simulatorQueue.finish).not.toHaveBeenCalled();
 				});
-				waits(10);
+				waitsFor(function() {
+					return simulator1.finish.callCount == 1;
+				}, "step 1 to finish", 100);
 				runs(function() {
 					simulatorQueue.updateObservable(null, "finish");
 				});
-				waits(45);
+				waitsFor(function() {
+					return simulator2.finish.callCount == 1;
+				}, "step 2 to finish", 100);
 				runs(function() {
 					simulatorQueue.updateObservable(simulator1, "finish");
 					expect(simulatorQueue.finish).not.toHaveBeenCalled();
 				});
-				waits(55);
+				waitsFor(function() {
+					return simulator3.finish.callCount == 1;
+				}, "step 3 to finish", 100);
 				runs(function() {
 					expect(simulatorQueue.finish).toHaveBeenCalled();
 				});
@@ -463,30 +600,36 @@ describe("jquery.maenulabs.simula", function() {
 			it("should throw an error when trying to execute while running, but not interfere execution", function() {
 				runs(function() {
 					spyOn(simulatorQueue, "finish").andCallThrough();
+					spyOn(simulator1, "finish").andCallThrough();
+					spyOn(simulator2, "finish").andCallThrough();
+					spyOn(simulator3, "finish").andCallThrough();
 					simulatorQueue.execute();
+					expect(function() {
+						simulatorQueue.execute();
+					}).toThrow(new Error("Simulator is already running"));
+					expect(simulatorQueue.finish).not.toHaveBeenCalled();
 				});
-				waits(10);
+				waitsFor(function() {
+					return simulator1.finish.callCount == 1;
+				}, "step 1 to finish", 100);
 				runs(function() {
 					expect(function() {
 						simulatorQueue.execute();
-					}).toThrow(new Error("SimulatorQueue is already running"));
+					}).toThrow(new Error("Simulator is already running"));
 					expect(simulatorQueue.finish).not.toHaveBeenCalled();
 				});
-				waits(45);
+				waitsFor(function() {
+					return simulator2.finish.callCount == 1;
+				}, "step 2 to finish", 100);
 				runs(function() {
 					expect(function() {
 						simulatorQueue.execute();
-					}).toThrow(new Error("SimulatorQueue is already running"));
+					}).toThrow(new Error("Simulator is already running"));
 					expect(simulatorQueue.finish).not.toHaveBeenCalled();
 				});
-				waits(55);
-				runs(function() {
-					expect(function() {
-						simulatorQueue.execute();
-					}).toThrow(new Error("SimulatorQueue is already running"));
-					expect(simulatorQueue.finish).not.toHaveBeenCalled();
-				});
-				waits(55);
+				waitsFor(function() {
+					return simulator3.finish.callCount == 1;
+				}, "step 3 to finish", 100);
 				runs(function() {
 					expect(simulatorQueue.finish).toHaveBeenCalled();
 				});
@@ -727,6 +870,7 @@ describe("jquery.maenulabs.simula", function() {
 		
 		afterEach(function() {
 			$markup.remove();
+			mouseEventSimulator.stop();
 		});
 		
 		it("should update observers when finished", function() {
@@ -739,7 +883,7 @@ describe("jquery.maenulabs.simula", function() {
 			});
 			waitsFor(function() {
 				return mouseSpy.callCount == 1;
-			}, "mouse spy to be called", 1000);
+			}, "mouse spy to be called", 50);
 			runs(function() {
 				expect(mouseEventSimulator.updateObservers).toHaveBeenCalled()
 			});
@@ -757,9 +901,9 @@ describe("jquery.maenulabs.simula", function() {
 			});
 			waitsFor(function() {
 				return mouseSpy.callCount == 1;
-			}, "mouse spy to be called", 1000);
+			}, "mouse spy to be called", 50);
 			runs(function() {
-				var event = mouseSpy.mostRecentCall.args[0];
+				var event = mouseSpy.mostRecentCall.args[0].originalEvent;
 				expect(mouseEvent.type).toEqual(event.type);
 				expect(mouseEvent.bubbles).toEqual(event.bubbles);
 				expect(mouseEvent.cancelable).toEqual(event.cancelable);
@@ -790,9 +934,9 @@ describe("jquery.maenulabs.simula", function() {
 			});
 			waitsFor(function() {
 				return mouseSpy.callCount == 1;
-			}, "mouse spy to be called", 1000);
+			}, "mouse spy to be called", 50);
 			runs(function() {
-				var event = mouseSpy.mostRecentCall.args[0];
+				var event = mouseSpy.mostRecentCall.args[0].originalEvent;
 				expect(mouseEvent.type).toEqual(event.type);
 				expect(mouseEvent.bubbles).toEqual(event.bubbles);
 				expect(mouseEvent.cancelable).toEqual(event.cancelable);
@@ -823,9 +967,9 @@ describe("jquery.maenulabs.simula", function() {
 			});
 			waitsFor(function() {
 				return mouseSpy.callCount == 1;
-			}, "mouse spy to be called", 1000);
+			}, "mouse spy to be called", 50);
 			runs(function() {
-				var event = mouseSpy.mostRecentCall.args[0];
+				var event = mouseSpy.mostRecentCall.args[0].originalEvent;
 				expect(mouseEvent.type).toEqual(event.type);
 				expect(mouseEvent.bubbles).toEqual(event.bubbles);
 				expect(mouseEvent.cancelable).toEqual(event.cancelable);
@@ -856,9 +1000,9 @@ describe("jquery.maenulabs.simula", function() {
 			});
 			waitsFor(function() {
 				return mouseSpy.callCount == 1;
-			}, "mouse spy to be called", 1000);
+			}, "mouse spy to be called", 50);
 			runs(function() {
-				var event = mouseSpy.mostRecentCall.args[0];
+				var event = mouseSpy.mostRecentCall.args[0].originalEvent;
 				expect(mouseEvent.type).toEqual(event.type);
 				expect(mouseEvent.bubbles).toEqual(event.bubbles);
 				expect(mouseEvent.cancelable).toEqual(event.cancelable);
@@ -889,9 +1033,9 @@ describe("jquery.maenulabs.simula", function() {
 			});
 			waitsFor(function() {
 				return mouseSpy.callCount == 1;
-			}, "mouse spy to be called", 1000);
+			}, "mouse spy to be called", 50);
 			runs(function() {
-				var event = mouseSpy.mostRecentCall.args[0];
+				var event = mouseSpy.mostRecentCall.args[0].originalEvent;
 				expect(mouseEvent.type).toEqual(event.type);
 				expect(mouseEvent.bubbles).toEqual(event.bubbles);
 				expect(mouseEvent.cancelable).toEqual(event.cancelable);
@@ -922,9 +1066,9 @@ describe("jquery.maenulabs.simula", function() {
 			});
 			waitsFor(function() {
 				return mouseSpy.callCount == 1;
-			}, "mouse spy to be called", 1000);
+			}, "mouse spy to be called", 50);
 			runs(function() {
-				var event = mouseSpy.mostRecentCall.args[0];
+				var event = mouseSpy.mostRecentCall.args[0].originalEvent;
 				expect(mouseEvent.type).toEqual(event.type);
 				expect(mouseEvent.bubbles).toEqual(event.bubbles);
 				expect(mouseEvent.cancelable).toEqual(event.cancelable);
@@ -971,12 +1115,14 @@ describe("jquery.maenulabs.simula", function() {
 		
 		afterEach(function() {
 			$markup.remove();
+			simulation.stop();
 		});
 		
 		it("should not be intercepted by other Observables", function() {
 			runs(function() {
 				spyOn(simulation, "finish").andCallThrough();
 				simulation.wait(50).wait(50).wait(50).execute();
+				expect(simulation.finish).not.toHaveBeenCalled();
 			});
 			waits(55);
 			runs(function() {
@@ -986,6 +1132,7 @@ describe("jquery.maenulabs.simula", function() {
 			waits(10);
 			runs(function() {
 				simulation.updateObservable(null, "finish");
+				expect(simulation.finish).not.toHaveBeenCalled();
 			});
 			waits(45);
 			runs(function() {
@@ -1020,7 +1167,7 @@ describe("jquery.maenulabs.simula", function() {
 				});
 			});
 			
-			it("should wait for the default duration", function() {
+			it("should wait for the default duration (50 ms)", function() {
 				runs(function() {
 					spyOn(simulation, "finish").andCallThrough();
 					simulation.wait().execute();
@@ -1044,10 +1191,11 @@ describe("jquery.maenulabs.simula", function() {
 				var y = target[1] - start[1];
 				return [x, y]
 			};
-			var getDistance = function(point) {
-				return Math.sqrt(point[0] * point[0] + point[1] * point[1]);
+			var getLength = function(vector) {
+				return Math.sqrt(vector[0] * vector[0] + vector[1] * vector[1]);
 			};
 			
+			var beforeExecution;
 			var moveSpy1;
 			var moveSpy11;
 			var moveSpy12;
@@ -1275,47 +1423,44 @@ describe("jquery.maenulabs.simula", function() {
 						this.targetClientPosition = [startClientPosition[0] + 16, startClientPosition[1] + 63];
 						// sqrt(16 * 16 + 63 * 63) = 65 pixels ~ 4 + 1 mousemove
 						simulation.move([16, 63]).execute();
-					});
-					waits(1);
-					runs(function() {
 						expect(moveSpy11).not.toHaveBeenCalled();
 					});
 					waitsFor(function() {
 						return moveSpy11.callCount == 1;
-					}, "another mousemove", 17);
+					}, "another mousemove", 100);
 					runs(function() {
 						var event = moveSpy11.mostRecentCall.args[0];
-						var d = getDistance(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
 						expect(Math.abs(15 - d)).toBeLessThan(1.5);
 						this.currentClientPosition = [event.clientX, event.clientY];
 						moveSpy11.reset();
 					});
 					waitsFor(function() {
 						return moveSpy11.callCount == 1;
-					}, "another mousemove", 17);
+					}, "another mousemove", 100);
 					runs(function() {
 						var event = moveSpy11.mostRecentCall.args[0];
-						var d = getDistance(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
 						expect(Math.abs(15 - d)).toBeLessThan(1.5);
 						this.currentClientPosition = [event.clientX, event.clientY];
 						moveSpy11.reset();
 					});
 					waitsFor(function() {
 						return moveSpy11.callCount == 1;
-					}, "another mousemove", 17);
+					}, "another mousemove", 100);
 					runs(function() {
 						var event = moveSpy11.mostRecentCall.args[0];
-						var d = getDistance(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
 						expect(Math.abs(15 - d)).toBeLessThan(1.5);
 						this.currentClientPosition = [event.clientX, event.clientY];
 						moveSpy11.reset();
 					});
 					waitsFor(function() {
 						return moveSpy11.callCount == 1;
-					}, "another mousemove", 17);
+					}, "another mousemove", 100);
 					runs(function() {
 						var event = moveSpy11.mostRecentCall.args[0];
-						var d = getDistance(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
 						expect(Math.abs(15 - d)).toBeLessThan(1.5);
 						this.currentClientPosition = [event.clientX, event.clientY];
 						moveSpy11.reset();
@@ -1323,13 +1468,13 @@ describe("jquery.maenulabs.simula", function() {
 					// last one
 					waitsFor(function() {
 						return moveSpy11.callCount == 1;
-					}, "another mousemove", 17);
+					}, "another mousemove", 100);
 					runs(function() {
 						var event = moveSpy11.mostRecentCall.args[0];
-						var d = getDistance(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
 						expect(d).toBeLessThan(15);
 						this.currentClientPosition = [event.clientX, event.clientY];
-						expect(getDistance(getDifference(this.currentClientPosition, this.targetClientPosition))).toBeLessThan(1.5);
+						expect(getLength(getDifference(this.currentClientPosition, this.targetClientPosition))).toBeLessThan(1.5);
 						expect(simulation.isRunning()).toBeFalsy();
 					});
 				});
@@ -1347,11 +1492,11 @@ describe("jquery.maenulabs.simula", function() {
 					});
 					waitsFor(function() {
 						return moveSpy1.callCount == 1;
-					}, "another mousemove", 17);
+					}, "another mousemove", 100);
 					// step 1: move over 111
 					runs(function() {
 						var event = moveSpy1.mostRecentCall.args[0];
-						var d = getDistance(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
 						expect(Math.abs(15 - d)).toBeLessThan(1.5);
 						this.currentClientPosition = [event.clientX, event.clientY];
 					});
@@ -1403,11 +1548,11 @@ describe("jquery.maenulabs.simula", function() {
 					});
 					waitsFor(function() {
 						return moveSpy1.callCount == 1;
-					}, "another mousemove", 17);
+					}, "another mousemove", 100);
 					// step 2: move over 1111
 					runs(function() {
 						var event = moveSpy1.mostRecentCall.args[0];
-						var d = getDistance(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
 						expect(Math.abs(15 - d)).toBeLessThan(1.5);
 						this.currentClientPosition = [event.clientX, event.clientY];
 					});
@@ -1459,11 +1604,11 @@ describe("jquery.maenulabs.simula", function() {
 					});
 					waitsFor(function() {
 						return moveSpy1.callCount == 1;
-					}, "another mousemove", 17);
+					}, "another mousemove", 100);
 					// step 3: move on 1111
 					runs(function() {
 						var event = moveSpy1.mostRecentCall.args[0];
-						var d = getDistance(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
 						expect(Math.abs(15 - d)).toBeLessThan(1.5);
 						this.currentClientPosition = [event.clientX, event.clientY];
 					});
@@ -1515,11 +1660,11 @@ describe("jquery.maenulabs.simula", function() {
 					});
 					waitsFor(function() {
 						return moveSpy1.callCount == 1;
-					}, "another mousemove", 17);
+					}, "another mousemove", 100);
 					// step 4: leave 1111
 					runs(function() {
 						var event = moveSpy1.mostRecentCall.args[0];
-						var d = getDistance(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
 						expect(Math.abs(15 - d)).toBeLessThan(1.5);
 						this.currentClientPosition = [event.clientX, event.clientY];
 					});
@@ -1571,11 +1716,11 @@ describe("jquery.maenulabs.simula", function() {
 					});
 					waitsFor(function() {
 						return moveSpy1.callCount == 1;
-					}, "another mousemove", 17);
+					}, "another mousemove", 100);
 					// step 5: move on 111
 					runs(function() {
 						var event = moveSpy1.mostRecentCall.args[0];
-						var d = getDistance(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
 						expect(Math.abs(15 - d)).toBeLessThan(1.5);
 						this.currentClientPosition = [event.clientX, event.clientY];
 					});
@@ -1627,11 +1772,11 @@ describe("jquery.maenulabs.simula", function() {
 					});
 					waitsFor(function() {
 						return moveSpy1.callCount == 1;
-					}, "another mousemove", 17);
+					}, "another mousemove", 100);
 					// step 6: move on 111
 					runs(function() {
 						var event = moveSpy1.mostRecentCall.args[0];
-						var d = getDistance(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
 						expect(Math.abs(15 - d)).toBeLessThan(1.5);
 						this.currentClientPosition = [event.clientX, event.clientY];
 					});
@@ -1683,11 +1828,11 @@ describe("jquery.maenulabs.simula", function() {
 					});
 					waitsFor(function() {
 						return moveSpy1.callCount == 1;
-					}, "another mousemove", 17);
+					}, "another mousemove", 100);
 					// step 7: leave 111
 					runs(function() {
 						var event = moveSpy1.mostRecentCall.args[0];
-						var d = getDistance(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
 						expect(Math.abs(15 - d)).toBeLessThan(1.5);
 						this.currentClientPosition = [event.clientX, event.clientY];
 					});
@@ -1739,11 +1884,11 @@ describe("jquery.maenulabs.simula", function() {
 					});
 					waitsFor(function() {
 						return moveSpy1.callCount == 1;
-					}, "another mousemove", 17);
+					}, "another mousemove", 100);
 					// step 8: move on 11
 					runs(function() {
 						var event = moveSpy1.mostRecentCall.args[0];
-						var d = getDistance(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
 						expect(Math.abs(15 - d)).toBeLessThan(1.5);
 						this.currentClientPosition = [event.clientX, event.clientY];
 					});
@@ -1796,14 +1941,14 @@ describe("jquery.maenulabs.simula", function() {
 					// last one
 					waitsFor(function() {
 						return moveSpy1.callCount == 1;
-					}, "another mousemove", 17);
+					}, "another mousemove", 100);
 					// step 9: leave 11
 					runs(function() {
 						var event = moveSpy1.mostRecentCall.args[0];
-						var d = getDistance(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
 						expect(d).toBeLessThan(15);
 						this.currentClientPosition = [event.clientX, event.clientY];
-						expect(getDistance(getDifference(this.currentClientPosition, this.targetClientPosition))).toBeLessThan(1.5);
+						expect(getLength(getDifference(this.currentClientPosition, this.targetClientPosition))).toBeLessThan(1.5);
 						expect(simulation.isRunning()).toBeFalsy();
 					});
 					runs(function() {
@@ -1853,15 +1998,16 @@ describe("jquery.maenulabs.simula", function() {
 				
 				it("should set duration", function() {
 					runs(function() {
+						beforeExecution = new Date();
 						simulation.move([1, 1], 20).execute();
-					});
-					waits(5);
-					runs(function() {
 						expect(moveSpy11).not.toHaveBeenCalled();
 					});
 					waitsFor(function() {
 						return moveSpy11.callCount == 1;
-					}, "mousemove to be called", 25);
+					}, "mousemove to be called", 100);
+					runs(function() {
+						expect((new Date()).getTime() - beforeExecution.getTime()).toBeGreaterThan(5);
+					});
 				});
 				
 			});
