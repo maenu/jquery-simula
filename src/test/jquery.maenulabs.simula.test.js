@@ -7,6 +7,152 @@
 
 describe("jquery.maenulabs.simula", function() {
 	
+	describe("jquery extensions", function() {
+	
+		describe("equals", function() {
+		
+			var markup = '<div id="one"></div>'
+						+ '<div id="two"></div>';
+			var $markup;
+		
+			beforeEach(function() {
+				$markup = $(markup);
+				$("body").append($markup);
+			});
+		
+			afterEach(function() {
+				$markup.remove();
+			});
+		
+			it("should be equal to itself", function() {
+				var $one = $("#one");
+				expect($one.equals($one)).toBeTruthy();
+			});
+		
+			it("should be equal to another jQuery with same selector", function() {
+				expect($("#one").equals($("#one"))).toBeTruthy();
+			});
+		
+			it("should be equal to another DOM element with same selector", function() {
+				expect($("#one").equals($("#one")[0])).toBeTruthy();
+			});
+		
+			it("should not be equal to another", function() {
+				var $one = $("#one");
+				var $two = $("#two");
+				expect($one.equals($two)).toBeFalsy();
+			});
+		
+		});
+	
+		describe("elementFromPoint", function() {
+		
+			var markup =	'<div id="spacer"></div>'
+							+ '<div id="one" style="margin-left: 100px; width: 200px; height:200px;">'
+								+ '<div id="two" style="width: 100px; height:100px;"></div>'
+							+ '</div>'
+							+ '<div id="three" style="margin-left: 100px; width: 100px; height:100px;"></div>';
+			var $markup;
+		
+			beforeEach(function() {
+				$markup = $(markup);
+				$("body").prepend($markup);
+			});
+		
+			afterEach(function() {
+				$markup.remove();
+			});
+		
+			it("should get elements when scrolled", function() {
+				$("#spacer").css("height", "1000px");
+				$("#spacer").css("width", "2000px");
+				$(document).scrollLeft(50);
+				$(document).scrollTop($("#one").offset().top - 23);
+				var oneClientX = $("#one").offset().left + $("#one").width() - 2 - $(document).scrollLeft();
+				var oneClientY = $("#one").offset().top + $("#one").height() - 2 - $(document).scrollTop();
+				var atOnePosition = $.elementFromPoint(oneClientX, oneClientY);
+				expect($("#one").equals($(atOnePosition))).toBeTruthy();
+				var twoClientX = $("#two").offset().left + 2 - $(document).scrollLeft();
+				var twoClientY = $("#two").offset().top + 2 - $(document).scrollTop();
+				var atTwoPosition = $.elementFromPoint(twoClientX, twoClientY);
+				expect($("#two").equals($(atTwoPosition))).toBeTruthy();
+				var threeClientX = $("#three").offset().left + 2 - $(document).scrollLeft();
+				var threeClientY = $("#three").offset().top + 2 - $(document).scrollTop();
+				var atThreePosition = $.elementFromPoint(threeClientX, threeClientY);
+				expect($("#three").equals($(atThreePosition))).toBeTruthy();
+			});
+		
+			it("should get elements when not scrolled", function() {
+				$(document).scrollLeft(0);
+				$(document).scrollTop(0);
+				var oneClientX = $("#one").offset().left + $("#one").width() - 2 - $(document).scrollLeft();
+				var oneClientY = $("#one").offset().top + $("#one").height() - 2 - $(document).scrollTop();
+				var atOnePosition = $.elementFromPoint(oneClientX, oneClientY);
+				expect($("#one").equals($(atOnePosition))).toBeTruthy();
+				var twoClientX = $("#two").offset().left + 2 - $(document).scrollLeft();
+				var twoClientY = $("#two").offset().top + 2 - $(document).scrollTop();
+				var atTwoPosition = $.elementFromPoint(twoClientX, twoClientY);
+				expect($("#two").equals($(atTwoPosition))).toBeTruthy();
+				var threeClientX = $("#three").offset().left + 2 - $(document).scrollLeft();
+				var threeClientY = $("#three").offset().top + 2 - $(document).scrollTop();
+				var atThreePosition = $.elementFromPoint(threeClientX, threeClientY);
+				expect($("#three").equals($(atThreePosition))).toBeTruthy();
+			});
+		
+		});
+	
+		describe("isParentOf", function() {
+		
+			var markup = '<div id="parent">'
+							+ '<div id="child1">'
+								+ '<div id="child1_1"></div>'
+							+ '</div>'
+							+ '<div id="child2"></div>'
+						+ '</div>'
+						+ '<div id="sibling"></div>';
+			var $markup;
+		
+			beforeEach(function() {
+				$markup = $(markup);
+				$("body").append($markup);
+			});
+		
+			afterEach(function() {
+				$markup.remove();
+			});
+		
+			it("should not be parent of sibling", function() {
+				expect($("#parent").isParentOf($("#sibling"))).toBeFalsy();
+				expect($("#sibling").isParentOf($("#parent"))).toBeFalsy();
+			});
+		
+			it("should not be parent of parent", function() {
+				expect($("#parent").isParentOf($("#parent"))).toBeFalsy();
+			});
+		
+			it("should not be that a child is the parent of parent", function() {
+				expect($("#child1").isParentOf($("#parent"))).toBeFalsy();
+				expect($("#child2").isParentOf($("#parent"))).toBeFalsy();
+			});
+		
+			it("should be the parent of children", function() {
+				expect($("#parent").isParentOf($("#child1"))).toBeTruthy();
+				expect($("#parent").isParentOf($("#child1_1"))).toBeTruthy();
+				expect($("#parent").isParentOf($("#child2"))).toBeTruthy();
+				expect($("#child1").isParentOf($("#child1_1"))).toBeTruthy();
+			});
+		
+			it("should be the parent of children as DOM elements", function() {
+				expect($("#parent").isParentOf($("#child1")[0])).toBeTruthy();
+				expect($("#parent").isParentOf($("#child1_1")[0])).toBeTruthy();
+				expect($("#parent").isParentOf($("#child2")[0])).toBeTruthy();
+				expect($("#child1").isParentOf($("#child1_1")[0])).toBeTruthy();
+			});
+		
+		});
+	
+	});
+	
 	describe("simula.Observer", function() {
 		
 		var observer;
