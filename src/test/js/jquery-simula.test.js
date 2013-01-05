@@ -17,7 +17,7 @@
  * @author Manuel Leuenberger
  */
 
-describe('jquery.maenulabs.simula', function () {
+describe('jquery.simula', function () {
 	/*jshint maxlen: 200, maxstatements: 100*/
 	
 	describe('jquery extensions', function () {
@@ -1649,7 +1649,7 @@ describe('jquery.maenulabs.simula', function () {
 					});
 					waitsFor(function () {
 						return moveSpy1.callCount == 1;
-					}, 'another mousemove', 100);
+					}, 'another mousemove', 120);
 					// step 1: move over 111
 					runs(function () {
 						var event = moveSpy1.mostRecentCall.args[0];
@@ -2410,7 +2410,7 @@ describe('jquery.maenulabs.simula', function () {
 					});
 					waitsFor(function () {
 						return !simulation.isRunning();
-					}, 'Simulation to finish', 2000);
+					}, 'Simulation to finish', 3000);
 					runs(function () {
 						expect(moveSpy1).toHaveBeenCalled();
 						expect(moveSpy11).toHaveBeenCalled();

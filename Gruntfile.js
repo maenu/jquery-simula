@@ -54,7 +54,7 @@ module.exports = function(grunt) {
 			},
 			min: {
 				files: {
-					'Time-<%= meta.package.version %>.min.js': '<%= meta.src.main %>/js/*.js'
+					'<%= meta.package.name %>-<%= meta.package.version %>.min.js': '<%= meta.src.main %>/js/*.js'
 				}
 			}
 		},
