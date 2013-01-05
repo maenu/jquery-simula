@@ -1,0 +1,28 @@
+{
+  "name": "jquery-simula",
+  "version": "0.4.0",
+  "description": "Simulate user interaction during testing.",
+  "keywords": [
+    "jquery",
+    "test",
+    "mouse",
+    "user interaction",
+    "simulation"
+  ],
+  "author": {
+    "name": "Manuel Leuenberger"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maenu/jquery-simula.git"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.0",
+    "grunt-istanbul": "git://github.com/taichi/grunt-istanbul.git",
+    "grunt-contrib-jshint": "~0.1.0",
+    "grunt-contrib-jasmine": "~0.2.0",
+    "grunt-contrib-clean": "~0.4.0a",
+    "grunt-contrib-uglify": "~0.1.0",
+    "grunt-contrib-yuidoc": "~0.3.2"
+  }
+}

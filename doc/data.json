@@ -1,0 +1,1393 @@
+{
+    "project": {
+        "name": "jquery-simula",
+        "description": "Simulate user interaction during testing.",
+        "version": "0.4.0"
+    },
+    "files": {
+        "src/main/js/jquery.simula.js": {
+            "name": "src/main/js/jquery.simula.js",
+            "modules": {
+                "jQuery": 1,
+                "jQuery.simula": 1
+            },
+            "classes": {
+                "Observer": 1,
+                "Observable": 1,
+                "SimulaEvent": 1,
+                "SimulaUIEvent": 1,
+                "SimulaMouseEvent": 1,
+                "Simulator": 1,
+                "SimulatorQueue": 1,
+                "TimeSimulator": 1,
+                "EventSimulator": 1,
+                "W3CMouseEventSimulator": 1,
+                "Simulation": 1
+            },
+            "fors": {
+                "jQuery": 1,
+                "jQuery.simula": 1
+            },
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "jQuery": {
+            "name": "jQuery",
+            "submodules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src/main/js/jquery.simula.js",
+            "line": 1,
+            "description": "jQuery user input simulation. The classes are exported to jQuery.simula.",
+            "author": "Manuel Leuenberger"
+        },
+        "jQuery.simula": {
+            "name": "jQuery.simula",
+            "submodules": {},
+            "classes": {
+                "jQuery": 1,
+                "jQuery.simula": 1,
+                "Observer": 1,
+                "Observable": 1,
+                "SimulaEvent": 1,
+                "SimulaUIEvent": 1,
+                "SimulaMouseEvent": 1,
+                "Simulator": 1,
+                "SimulatorQueue": 1,
+                "TimeSimulator": 1,
+                "EventSimulator": 1,
+                "W3CMouseEventSimulator": 1,
+                "Simulation": 1
+            },
+            "fors": {
+                "jQuery": 1,
+                "jQuery.simula": 1
+            },
+            "namespaces": {},
+            "tag": "module",
+            "file": "src/main/js/jquery.simula.js",
+            "line": 855,
+            "description": "jQuery user input simulation. The classes are exported to jQuery.simula."
+        }
+    },
+    "classes": {
+        "jQuery": {
+            "name": "jQuery",
+            "shortname": "jQuery",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "jQuery.simula",
+            "namespace": ""
+        },
+        "jQuery.simula": {
+            "name": "jQuery.simula",
+            "shortname": "jQuery.simula",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "jQuery.simula",
+            "namespace": ""
+        },
+        "Observer": {
+            "name": "Observer",
+            "shortname": "Observer",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "jQuery.simula",
+            "namespace": "",
+            "file": "src/main/js/jquery.simula.js",
+            "line": 89,
+            "description": "Creates an Observer.",
+            "is_constructor": 1
+        },
+        "Observable": {
+            "name": "Observable",
+            "shortname": "Observable",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "jQuery.simula",
+            "namespace": "",
+            "file": "src/main/js/jquery.simula.js",
+            "line": 107,
+            "description": "Creates an Observable.",
+            "is_constructor": 1
+        },
+        "SimulaEvent": {
+            "name": "SimulaEvent",
+            "shortname": "SimulaEvent",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "jQuery.simula",
+            "namespace": "",
+            "file": "src/main/js/jquery.simula.js",
+            "line": 171,
+            "description": "Creates a SimulaEvent. Properties are taken from\nhttp://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-Event.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "options",
+                    "description": "The options to use for the event. If some\n    properties are missing, the default values are used. It must contain\n    a type property",
+                    "type": "Object"
+                }
+            ]
+        },
+        "SimulaUIEvent": {
+            "name": "SimulaUIEvent",
+            "shortname": "SimulaUIEvent",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "jQuery.simula",
+            "namespace": "",
+            "file": "src/main/js/jquery.simula.js",
+            "line": 247,
+            "description": "Creates an SimulaUIEvent. Properties are taken from\nhttp://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-SimulaUIEvent.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "options",
+                    "description": "The options to use for the event. If some\n    properties are missing, the default values are used.",
+                    "type": "Object"
+                }
+            ]
+        },
+        "SimulaMouseEvent": {
+            "name": "SimulaMouseEvent",
+            "shortname": "SimulaMouseEvent",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "jQuery.simula",
+            "namespace": "",
+            "file": "src/main/js/jquery.simula.js",
+            "line": 288,
+            "description": "Creates a SimulaMouseEvent. Properties are taken from\nhttp://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-\nSimulaMouseEvent.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "options",
+                    "description": "The options to use for the event. If some\n    properties are missing, the default values are used.",
+                    "type": "Object"
+                }
+            ]
+        },
+        "Simulator": {
+            "name": "Simulator",
+            "shortname": "Simulator",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "jQuery.simula",
+            "namespace": "",
+            "file": "src/main/js/jquery.simula.js",
+            "line": 506,
+            "description": "Creates a Simulator.",
+            "is_constructor": 1
+        },
+        "SimulatorQueue": {
+            "name": "SimulatorQueue",
+            "shortname": "SimulatorQueue",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "jQuery.simula",
+            "namespace": "",
+            "file": "src/main/js/jquery.simula.js",
+            "line": 572,
+            "description": "Creates a SimulatorQueue.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "simulators",
+                    "description": "An ordered Array of Simulators which will be\n    executed one after another",
+                    "type": "Array"
+                }
+            ]
+        },
+        "TimeSimulator": {
+            "name": "TimeSimulator",
+            "shortname": "TimeSimulator",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "jQuery.simula",
+            "namespace": "",
+            "file": "src/main/js/jquery.simula.js",
+            "line": 649,
+            "description": "Creates a TimeSimulator.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "time",
+                    "description": "The amount of milliseconds to wait before the\n    Observers are updated",
+                    "type": "Number"
+                }
+            ]
+        },
+        "EventSimulator": {
+            "name": "EventSimulator",
+            "shortname": "EventSimulator",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "jQuery.simula",
+            "namespace": "",
+            "file": "src/main/js/jquery.simula.js",
+            "line": 694,
+            "description": "Creates an EventSimulator.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "$element",
+                    "description": "The jQuery element on which to dispatch the\n    event",
+                    "type": "JQuery"
+                },
+                {
+                    "name": "simulaEvent",
+                    "description": "The SimulaEvent to init and dispatch",
+                    "type": "SimulaEvent"
+                }
+            ]
+        },
+        "W3CMouseEventSimulator": {
+            "name": "W3CMouseEventSimulator",
+            "shortname": "W3CMouseEventSimulator",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "jQuery.simula",
+            "namespace": "",
+            "file": "src/main/js/jquery.simula.js",
+            "line": 801,
+            "description": "Creates an W3CMouseEventSimulator.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "$element",
+                    "description": "The jQuery element on which to dispatch the\n    event",
+                    "type": "JQuery"
+                },
+                {
+                    "name": "mouseEvent",
+                    "description": "The SimulaMouseEvent to init and\n    dispatch",
+                    "type": "SimulaMouseEvent"
+                }
+            ]
+        },
+        "Simulation": {
+            "name": "Simulation",
+            "shortname": "Simulation",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "jQuery.simula",
+            "namespace": "",
+            "file": "src/main/js/jquery.simula.js",
+            "line": 855,
+            "description": "Creates a Simulation. Moves a pixel per millisecond. Note that the\ninternal $element and elementPosition only reflect the current state\nduring construction/chaining of the Simulation. This means that these\nstay the same during execution.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "$element",
+                    "description": "The jQuery element over which the mouse is",
+                    "type": "JQuery"
+                },
+                {
+                    "name": "elementPosition",
+                    "description": "The mouse position [x, y] relative to the\n    specified element",
+                    "type": "Array"
+                }
+            ]
+        }
+    },
+    "classitems": [
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 11,
+            "description": "Checks if the other's first DOM element is the same as the calling one.",
+            "itemtype": "method",
+            "name": "equals",
+            "params": [
+                {
+                    "name": "other",
+                    "description": "A jQuery object",
+                    "type": "JQuery"
+                }
+            ],
+            "return": {
+                "description": "true, if the first DOM element is the same, false\n    otherwise",
+                "type": "Boolean"
+            },
+            "class": "jQuery",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 29,
+            "description": "Gets the DOM element from point, as in the W3C description.",
+            "itemtype": "method",
+            "name": "elementFromPoint",
+            "params": [
+                {
+                    "name": "clientX",
+                    "description": "The clientX coordinate",
+                    "type": "Number"
+                },
+                {
+                    "name": "clientY",
+                    "description": "The clientY coordinate",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "The DOM element, if present. Null if not supported\n    by browser",
+                "type": "DOMElement"
+            },
+            "class": "jQuery",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 69,
+            "description": "Check if the specified child is a child.",
+            "itemtype": "method",
+            "name": "isParentOf",
+            "params": [
+                {
+                    "name": "child!~YUIDOC_LINE~!",
+                    "description": "A jQuery object that may be a child of the parent",
+                    "type": "JQuery"
+                }
+            ],
+            "return": {
+                "description": "true, if the specified child is really a child of the\n    parent, false otherwise",
+                "type": "Boolean"
+            },
+            "class": "jQuery",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 97,
+            "description": "Called whenever an Observable updates its Observers.",
+            "itemtype": "method",
+            "name": "updateObservable",
+            "params": [
+                {
+                    "name": "observable",
+                    "description": "The Observable",
+                    "type": "Observable"
+                },
+                {
+                    "name": "args",
+                    "description": "The arguments passed by the observable",
+                    "type": "Object"
+                }
+            ],
+            "class": "Observer",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 115,
+            "description": "The Observers.",
+            "itemtype": "property",
+            "name": "observers",
+            "type": "{Array}",
+            "default": "[]",
+            "class": "Observable",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 124,
+            "description": "Updates all Observers this the specified arguments.",
+            "itemtype": "method",
+            "name": "updateObservers",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "The arguments to pass to the Observers",
+                    "type": "Object"
+                }
+            ],
+            "class": "Observable",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 136,
+            "description": "Adds an Observer. If it is already registered, it will not be added\nagain.",
+            "itemtype": "method",
+            "name": "addObserver",
+            "params": [
+                {
+                    "name": "observer",
+                    "description": "The observer to add",
+                    "type": "Observer"
+                }
+            ],
+            "class": "Observable",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 153,
+            "description": "Removes an Observer. If it is not already registered, it will not have no\neffect.",
+            "itemtype": "method",
+            "name": "removeObserver",
+            "params": [
+                {
+                    "name": "observer",
+                    "description": "The observer to remove",
+                    "type": "Observer"
+                }
+            ],
+            "class": "Observable",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 189,
+            "description": "The name of the event (case-insensitive). The name must be an XML\nname.",
+            "itemtype": "property",
+            "name": "type",
+            "type": "{String}",
+            "class": "SimulaEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 197,
+            "description": "Used to indicate whether or not an event is a bubbling event. If the\nevent can bubble the value is true, else the value is false.",
+            "itemtype": "property",
+            "name": "bubbles",
+            "type": "{Boolean}",
+            "default": "true",
+            "class": "SimulaEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 206,
+            "description": "Used to indicate whether or not an event can have its default action\nprevented. If the default action can be prevented the value is true,\nelse the value is false.",
+            "itemtype": "property",
+            "name": "cancelable",
+            "type": "{Boolean}",
+            "default": "true",
+            "class": "SimulaEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 218,
+            "description": "Capturing phase.",
+            "static": 1,
+            "itemtype": "property",
+            "name": "PHASE.CAPTURING",
+            "type": "{NUMBER}",
+            "default": "1",
+            "class": "SimulaEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 227,
+            "description": "At target phase.",
+            "static": 1,
+            "itemtype": "property",
+            "name": "PHASE.AT_TARGET",
+            "type": "{NUMBER}",
+            "default": "2",
+            "class": "SimulaEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 236,
+            "description": "Bubbling phase.",
+            "static": 1,
+            "itemtype": "property",
+            "name": "PHASE.BUBBLING",
+            "type": "{NUMBER}",
+            "default": "3",
+            "class": "SimulaEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 266,
+            "description": "The view attribute identifies the AbstractView from which the event\nwas generated.",
+            "itemtype": "property",
+            "name": "view",
+            "type": "{Object}",
+            "default": "window",
+            "class": "SimulaUIEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 275,
+            "description": "Specifies some detail information about the Event, depending on the\ntype of event.",
+            "itemtype": "property",
+            "name": "detail",
+            "type": "{Number}",
+            "default": "0",
+            "class": "SimulaUIEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 316,
+            "description": "The horizontal coordinate at which the event occurred relative to the\norigin of the screen coordinate system.",
+            "itemtype": "property",
+            "name": "screenX",
+            "type": "{Number}",
+            "default": "0",
+            "class": "SimulaMouseEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 325,
+            "description": "The vertical coordinate at which the event occurred relative to the\norigin of the screen coordinate system.",
+            "itemtype": "property",
+            "name": "screenY",
+            "type": "{Number}",
+            "default": "0",
+            "class": "SimulaMouseEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 334,
+            "description": "The horizontal coordinate at which the event occurred relative to the\nDOM implementation's client area.",
+            "itemtype": "property",
+            "name": "clientX",
+            "type": "{Number}",
+            "default": "0",
+            "class": "SimulaMouseEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 343,
+            "description": "The vertical coordinate at which the event occurred relative to the\nDOM implementation's client area.",
+            "itemtype": "property",
+            "name": "client>",
+            "type": "{Number}",
+            "default": "0",
+            "class": "SimulaMouseEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 352,
+            "description": "Used to indicate whether the 'ctrl' key was depressed during the\nfiring of the event.",
+            "itemtype": "property",
+            "name": "ctrlKey",
+            "type": "{Boolean}",
+            "default": "false",
+            "class": "SimulaMouseEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 361,
+            "description": "Used to indicate whether the 'shift' key was depressed during the\nfiring of the event.",
+            "itemtype": "property",
+            "name": "shiftKey",
+            "type": "{Boolean}",
+            "default": "false",
+            "class": "SimulaMouseEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 370,
+            "description": "Used to indicate whether the 'alt' key was depressed during the\nfiring of the event. On some platforms this key may map to an\nalternative key name.",
+            "itemtype": "property",
+            "name": "altKey",
+            "type": "{Boolean}",
+            "default": "false",
+            "class": "SimulaMouseEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 380,
+            "description": "Used to indicate whether the 'meta' key was depressed during the\nfiring of the event. On some platforms this key may map to an\nalternative key name.",
+            "itemtype": "property",
+            "name": "metaKey",
+            "type": "{Boolean}",
+            "default": "false",
+            "class": "SimulaMouseEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 390,
+            "description": "During mouse events caused by the depression or release of a mouse\nbutton, button is used to indicate which mouse button changed state.\nThe values for button range from zero to indicate the left button of\nthe mouse, one to indicate the middle button if present, and two to\nindicate the right button. For mice configured for left handed use in\nwhich the button actions are reversed the values are instead read\nfrom right to left.\nUse $.simula.MOUSE.BUTTON.[LEFT | MIDDLE | RIGHT].",
+            "itemtype": "property",
+            "name": "button",
+            "type": "{Number}",
+            "default": "$.simula.MOUSE.BUTTON.LEFT",
+            "class": "SimulaMouseEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 405,
+            "description": "Used to identify a secondary EventTarget related to a UI event.\nCurrently this attribute is used with the mouseover event to indicate\nthe EventTarget which the pointing device exited and with the\nmouseout event to indicate the EventTarget which the pointing device\nentered.",
+            "itemtype": "property",
+            "name": "relatedTarget",
+            "type": "{Object}",
+            "default": "document",
+            "class": "SimulaMouseEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 421,
+            "description": "Left mouse button.",
+            "static": 1,
+            "itemtype": "property",
+            "name": "BUTTON.LEFT",
+            "type": "{NUMBER}",
+            "default": "0",
+            "class": "SimulaMouseEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 430,
+            "description": "Middle mouse button.",
+            "static": 1,
+            "itemtype": "property",
+            "name": "BUTTON.MIDDLE",
+            "type": "{NUMBER}",
+            "default": "1",
+            "class": "SimulaMouseEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 439,
+            "description": "Right mouse button.",
+            "static": 1,
+            "itemtype": "property",
+            "name": "BUTTON.RIGHT",
+            "type": "{NUMBER}",
+            "default": "2",
+            "class": "SimulaMouseEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 450,
+            "description": "Mouse click event.",
+            "static": 1,
+            "itemtype": "property",
+            "name": "TYPE.CLICK",
+            "type": "{String}",
+            "default": "\"click\"",
+            "class": "SimulaMouseEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 459,
+            "description": "Mouse down event.",
+            "static": 1,
+            "itemtype": "property",
+            "name": "TYPE.DOWN",
+            "type": "{String}",
+            "default": "\"mousedown\"",
+            "class": "SimulaMouseEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 468,
+            "description": "Mouse up event.",
+            "static": 1,
+            "itemtype": "property",
+            "name": "TYPE.UP",
+            "type": "{String}",
+            "default": "\"mouseup\"",
+            "class": "SimulaMouseEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 477,
+            "description": "Mouse over event.",
+            "static": 1,
+            "itemtype": "property",
+            "name": "TYPE.OVER",
+            "type": "{String}",
+            "default": "\"mouseover\"",
+            "class": "SimulaMouseEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 486,
+            "description": "Mouse out event.",
+            "static": 1,
+            "itemtype": "property",
+            "name": "TYPE.OUT",
+            "type": "{String}",
+            "default": "\"mouseout\"",
+            "class": "SimulaMouseEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 495,
+            "description": "Mouse move event.",
+            "static": 1,
+            "itemtype": "property",
+            "name": "TYPE.MOVE",
+            "type": "{String}",
+            "default": "\"mousemove\"",
+            "class": "SimulaMouseEvent",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 516,
+            "description": "true, if it is running.",
+            "itemtype": "property",
+            "name": "running",
+            "type": "{Boolean}",
+            "default": "false",
+            "class": "Simulator",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 527,
+            "description": "Updates all Observers with 'finish'.",
+            "itemtype": "method",
+            "name": "finish",
+            "class": "Simulator",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 536,
+            "description": "Starts the the simulation, i.e. dispatches events. Must call finish, at\nthe end.",
+            "itemtype": "method",
+            "name": "execute",
+            "throws": [
+                "{Error} If it is already running"
+            ],
+            "class": "Simulator",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 550,
+            "description": "Finishes the simulation even if its running. Doesn't do anything if not.",
+            "itemtype": "method",
+            "name": "stop",
+            "class": "Simulator",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 561,
+            "description": "Checks if it is running.",
+            "itemtype": "method",
+            "name": "isRunning",
+            "return": {
+                "description": "true, if it is, false otherwise",
+                "type": "Boolean"
+            },
+            "class": "Simulator",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 585,
+            "description": "The Simulators.",
+            "itemtype": "property",
+            "name": "simulators",
+            "type": "{Array}",
+            "class": "SimulatorQueue",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 592,
+            "description": "The index of the current Simulator.",
+            "itemtype": "property",
+            "name": "currentIndex",
+            "type": "{Number}",
+            "default": "-1",
+            "class": "SimulatorQueue",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 637,
+            "description": "Proceeds with the execution of the next Simulator.",
+            "itemtype": "method",
+            "name": "proceed",
+            "class": "SimulatorQueue",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 662,
+            "description": "The amount of milliseconds to wait before the Observers are updated.",
+            "itemtype": "property",
+            "name": "time",
+            "type": "{Number}",
+            "class": "TimeSimulator",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 669,
+            "description": "The id of the timeout.",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "property",
+            "name": "relatedTarget",
+            "type": "{Object}",
+            "default": "null",
+            "class": "TimeSimulator",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 708,
+            "description": "The jQuery element on which to dispatch the event.",
+            "itemtype": "property",
+            "name": "$element",
+            "type": "{jQuery}",
+            "class": "EventSimulator",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 715,
+            "description": "The SimulaEvent to init and dispatch.",
+            "itemtype": "property",
+            "name": "simulaEvent",
+            "type": "{SimulaEvent}",
+            "class": "EventSimulator",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 722,
+            "description": "The listener to add and remove.",
+            "itemtype": "property",
+            "name": "listener",
+            "type": "{Function}",
+            "default": "function () {}",
+            "class": "EventSimulator",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 730,
+            "description": "The Event that is dispatched.",
+            "itemtype": "property",
+            "name": "event",
+            "type": "{Event}",
+            "default": "null",
+            "class": "EventSimulator",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 741,
+            "description": "Template method that builds the Event.",
+            "itemtype": "method",
+            "name": "buildEvent",
+            "return": {
+                "description": "An Event that can be dispatched by dispatchEvent",
+                "type": "Event"
+            },
+            "class": "EventSimulator",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 751,
+            "description": "Template method to add an event listener for the specified Event.",
+            "itemtype": "method",
+            "name": "addEventListener",
+            "class": "EventSimulator",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 759,
+            "description": "Template method to remove an event listener for the specified Event.",
+            "itemtype": "method",
+            "name": "removeEventListener",
+            "class": "EventSimulator",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 767,
+            "description": "Event listener that calls finish if the specified Event is the one that\nwas dispatched.",
+            "itemtype": "method",
+            "name": "handleEvent",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The Event that was found",
+                    "type": "Event"
+                }
+            ],
+            "class": "EventSimulator",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 783,
+            "description": "Template method that dispatches an Event.",
+            "itemtype": "method",
+            "name": "dispatchEvent",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The event to be dispatched",
+                    "type": "Event"
+                }
+            ],
+            "class": "EventSimulator",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 872,
+            "description": "The internally used SimulatorQueue.",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "property",
+            "name": "simulatorQueue",
+            "type": "{SimulatorQueue}",
+            "default": "new SimulatorQueue([])",
+            "class": "Simulation",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 881,
+            "description": "The jQuery element over which the mouse is.",
+            "itemtype": "property",
+            "name": "$element",
+            "type": "{jQuery}",
+            "class": "Simulation",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 888,
+            "description": "The mouse position relative to the specified element.",
+            "itemtype": "property",
+            "name": "elementPosition",
+            "type": "{Array}",
+            "class": "Simulation",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 910,
+            "description": "Waits for the specified duration before executing the next command.",
+            "itemtype": "method",
+            "name": "wait",
+            "params": [
+                {
+                    "name": "duration",
+                    "description": "The duration in milliseconds",
+                    "type": "Number",
+                    "optional": true,
+                    "optdefault": "500"
+                }
+            ],
+            "return": {
+                "description": "The Simulation itself to allow chaining",
+                "type": "Simulation"
+            },
+            "class": "Simulation",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 927,
+            "description": "Adds exactly one mousemove with the specified options and element.",
+            "itemtype": "method",
+            "name": "mousemove",
+            "params": [
+                {
+                    "name": "$element",
+                    "description": "The element to move on, must be added to the\n    DOM",
+                    "type": "JQuery",
+                    "optional": true
+                },
+                {
+                    "name": "options",
+                    "description": "The options to pass to the MouseEventSimulator",
+                    "type": "Object",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "The Simulation itself to allow chaining",
+                "type": "Simulation"
+            },
+            "class": "Simulation",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 955,
+            "description": "Adds exactly one mouseover with the specified options and element.",
+            "itemtype": "method",
+            "name": "mouseover",
+            "params": [
+                {
+                    "name": "$element",
+                    "description": "The element to move over on, must be added to\n    the DOM",
+                    "type": "JQuery",
+                    "optional": true
+                },
+                {
+                    "name": "options",
+                    "description": "The options to pass to the MouseEventSimulator",
+                    "type": "Object",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "The Simulation itself to allow chaining",
+                "type": "Simulation"
+            },
+            "class": "Simulation",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 982,
+            "description": "Adds exactly one mouseout with the specified options and element.",
+            "itemtype": "method",
+            "name": "mouseout",
+            "params": [
+                {
+                    "name": "$element",
+                    "description": "The element to move out, must be added to the\n    DOM",
+                    "type": "JQuery",
+                    "optional": true
+                },
+                {
+                    "name": "options",
+                    "description": "The options to pass to the MouseEventSimulator",
+                    "type": "Object",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "The Simulation itself to allow chaining",
+                "type": "Simulation"
+            },
+            "class": "Simulation",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 1009,
+            "description": "Adds exactly one mousedown with the specified options and element.",
+            "itemtype": "method",
+            "name": "mousedown",
+            "params": [
+                {
+                    "name": "$element",
+                    "description": "The element to press the mouse down, must be\n    added to the DOM",
+                    "type": "JQuery",
+                    "optional": true
+                },
+                {
+                    "name": "options",
+                    "description": "The options to pass to the MouseEventSimulator",
+                    "type": "Object",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "The Simulation itself to allow chaining",
+                "type": "Simulation"
+            },
+            "class": "Simulation",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 1038,
+            "description": "Adds exactly one mouseup with the specified options and element.",
+            "itemtype": "method",
+            "name": "mouseup",
+            "params": [
+                {
+                    "name": "$element",
+                    "description": "The element to release the mouse up, must be\n    added to the DOM",
+                    "type": "JQuery",
+                    "optional": true
+                },
+                {
+                    "name": "options",
+                    "description": "The options to pass to the MouseEventSimulator",
+                    "type": "Object",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "The Simulation itself to allow chaining",
+                "type": "Simulation"
+            },
+            "class": "Simulation",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 1067,
+            "description": "Adds exactly one click with the specified options and element.",
+            "itemtype": "method",
+            "name": "mouseclick",
+            "params": [
+                {
+                    "name": "$element",
+                    "description": "The element to click on, must be added to the\n    DOM",
+                    "type": "JQuery",
+                    "optional": true
+                },
+                {
+                    "name": "options",
+                    "description": "The options to pass to the MouseEventSimulator",
+                    "type": "Object",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "The Simulation itself to allow chaining",
+                "type": "Simulation"
+            },
+            "class": "Simulation",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 1096,
+            "description": "Moves the mouse to the specified position in the specified duration by\ndispatching a mousemove every 15 milliseconds.",
+            "itemtype": "method",
+            "name": "move",
+            "params": [
+                {
+                    "name": "elementPosition",
+                    "description": "The mouse position [x, y] relative to the\n    current element",
+                    "type": "Array"
+                },
+                {
+                    "name": "duration",
+                    "description": "The time to use to move to the specified\n    position in milliseconds",
+                    "type": "Number",
+                    "optional": true
+                },
+                {
+                    "name": "options",
+                    "description": "The options to pass to the MouseEventSimulator",
+                    "type": "Object",
+                    "optional": true
+                },
+                {
+                    "name": "auto",
+                    "description": "The mouse move mode. If true, whenever the\n    mouse moves over and out of an element, it dispatches the according\n    event and sets the internal $element and elementPosition",
+                    "type": "Boolean",
+                    "optional": true,
+                    "optdefault": "false"
+                }
+            ],
+            "return": {
+                "description": "The Simulation itself to allow chaining",
+                "type": "Simulation"
+            },
+            "class": "Simulation",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 1181,
+            "description": "Moves the mouse over the specified element.",
+            "itemtype": "method",
+            "name": "enter",
+            "params": [
+                {
+                    "name": "$element",
+                    "description": "The element to move over, must be added to the\n    DOM",
+                    "type": "JQuery"
+                },
+                {
+                    "name": "options",
+                    "description": "The options to pass to the MouseEventSimulator",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "The Simulation itself to allow chaining",
+                "type": "Simulation"
+            },
+            "class": "Simulation",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 1231,
+            "description": "Moves the mouse out of the specified element.",
+            "itemtype": "method",
+            "name": "leave",
+            "params": [
+                {
+                    "name": "$element",
+                    "description": "The element to move out, must be added to the\n    DOM",
+                    "type": "JQuery",
+                    "optional": true
+                },
+                {
+                    "name": "options",
+                    "description": "The options to pass to the MouseEventSimulator",
+                    "type": "Object",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "The Simulation itself to allow chaining",
+                "type": "Simulation"
+            },
+            "class": "Simulation",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 1278,
+            "description": "Presses a mouse button while over an element.",
+            "itemtype": "method",
+            "name": "press",
+            "params": [
+                {
+                    "name": "$element",
+                    "description": "The element to press the mouse button on. It\n    will be entered, if it is not already on it",
+                    "type": "JQuery",
+                    "optional": true
+                },
+                {
+                    "name": "options",
+                    "description": "The options to pass to the MouseEventSimulator",
+                    "type": "Object",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "The Simulation itself to allow chaining",
+                "type": "Simulation"
+            },
+            "class": "Simulation",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 1306,
+            "description": "Releases a mouse button while over an element.",
+            "itemtype": "method",
+            "name": "release",
+            "params": [
+                {
+                    "name": "$element",
+                    "description": "The element to release the mouse button on. It\n    will be entered, if it is not already on it",
+                    "type": "JQuery",
+                    "optional": true
+                },
+                {
+                    "name": "options",
+                    "description": "The options to pass to the MouseEventSimulator",
+                    "type": "Object",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "The Simulation itself to allow chaining",
+                "type": "Simulation"
+            },
+            "class": "Simulation",
+            "module": "jQuery.simula"
+        },
+        {
+            "file": "src/main/js/jquery.simula.js",
+            "line": 1334,
+            "description": "Clicks a mouse button while over an element.",
+            "itemtype": "method",
+            "name": "click",
+            "params": [
+                {
+                    "name": "$element",
+                    "description": "The element to click the mouse button on. It\n    will be entered, if it is not already on it",
+                    "type": "JQuery",
+                    "optional": true
+                },
+                {
+                    "name": "options",
+                    "description": "The options to pass to the MouseEventSimulator",
+                    "type": "Object",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "The Simulation itself to allow chaining",
+                "type": "Simulation"
+            },
+            "class": "Simulation",
+            "module": "jQuery.simula"
+        }
+    ],
+    "warnings": []
+}
