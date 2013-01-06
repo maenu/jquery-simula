@@ -41,6 +41,8 @@
         <div id="api-tabview-panel">
             <ul id="api-classes" class="apis classes">
             
+                <li><a href="..&#x2F;classes/..html">.</a></li>
+            
                 <li><a href="..&#x2F;classes/EventSimulator.html">EventSimulator</a></li>
             
                 <li><a href="..&#x2F;classes/jQuery.html">jQuery</a></li>
@@ -61,7 +63,7 @@
             
                 <li><a href="..&#x2F;classes/SimulatorQueue.html">SimulatorQueue</a></li>
             
-                <li><a href="..&#x2F;classes/SimulaUIEvent.html">SimulaUIEvent</a></li>
+                <li><a href="..&#x2F;classes/SimulaUiEvent.html">SimulaUiEvent</a></li>
             
                 <li><a href="..&#x2F;classes/TimeSimulator.html">TimeSimulator</a></li>
             
@@ -115,10 +117,14 @@
     
 
     
+        <div class="extends">
+            Extends <a href="../classes/EventSimulator.html" class="crosslink">EventSimulator</a>
+        </div>
+    
 
     
         <div class="foundat">
-            Defined in: <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l801"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:801</code></a>
+            Defined in: <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l807"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:807</code></a>
         </div>
     
 
@@ -188,7 +194,7 @@
             
         
         
-        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l801"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:801</code></a>
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l807"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:807</code></a>
         
         </p>
 
@@ -257,6 +263,10 @@
         <li class="api-class-tab index"><a href="#index">Index</a></li>
 
         
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+        
+        
+            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
         
         
         
@@ -267,7 +277,149 @@
             <h2 class="off-left">Item Index</h2>
 
             
+                <div class="index-section methods">
+                    <h3>Methods</h3>
 
+                    <ul class="index-list methods extends">
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_addEventListener">addEventListener</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_addObserver">addObserver</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_buildEvent">buildEvent</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_dispatchEvent">dispatchEvent</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_execute">execute</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_finish">finish</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_handleEvent">handleEvent</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_isRunning">isRunning</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_removeEventListener">removeEventListener</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_removeObserver">removeObserver</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_stop">stop</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_updateObservers">updateObservers</a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
+            
+
+            
+                <div class="index-section properties">
+                    <h3>Properties</h3>
+
+                    <ul class="index-list properties extends">
+                        
+                            <li class="index-item property inherited">
+                                <a href="#property_$element">$element</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property inherited">
+                                <a href="#property_event">event</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property inherited">
+                                <a href="#property_listener">listener</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property inherited">
+                                <a href="#property_observers">observers</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property inherited">
+                                <a href="#property_running">running</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property inherited">
+                                <a href="#property_simulaEvent">simulaEvent</a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
             
 
             
@@ -276,7 +428,1088 @@
         </div>
 
         
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
 
+                
+                    <div id="method_addEventListener" class="method item inherited">
+    <h3 class="name"><code>addEventListener</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;EventSimulator.html#method_addEventListener">EventSimulator</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l757"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:757</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Template method to add an event listener for the specified Event.</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_addObserver" class="method item inherited">
+    <h3 class="name"><code>addObserver</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>observer</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;Observable.html#method_addObserver">Observable</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l136"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:136</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Adds an Observer. If it is already registered, it will not be added
+again.</p>
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">observer</code>
+                        <span class="type"><a href="../classes/Observer.html" class="crosslink">Observer</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The observer to add</p>
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_buildEvent" class="method item inherited">
+    <h3 class="name"><code>buildEvent</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Event</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;EventSimulator.html#method_buildEvent">EventSimulator</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l747"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:747</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Template method that builds the Event.</p>
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Event</span>:
+                    
+                    An Event that can be dispatched by dispatchEvent
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_dispatchEvent" class="method item inherited">
+    <h3 class="name"><code>dispatchEvent</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;EventSimulator.html#method_dispatchEvent">EventSimulator</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l789"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:789</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Template method that dispatches an Event.</p>
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Event</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The event to be dispatched</p>
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_execute" class="method item inherited">
+    <h3 class="name"><code>execute</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;Simulator.html#method_execute">Simulator</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l539"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:539</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Starts the the simulation, i.e. dispatches events. Must call finish, at
+the end.</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_finish" class="method item inherited">
+    <h3 class="name"><code>finish</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;Simulator.html#method_finish">Simulator</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l530"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:530</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Updates all Observers with 'finish'.</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_handleEvent" class="method item inherited">
+    <h3 class="name"><code>handleEvent</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>event</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;EventSimulator.html#method_handleEvent">EventSimulator</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l773"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:773</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Event listener that calls finish if the specified Event is the one that
+was dispatched.</p>
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">event</code>
+                        <span class="type">Event</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The Event that was found</p>
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_isRunning" class="method item inherited">
+    <h3 class="name"><code>isRunning</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Boolean</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;Simulator.html#method_isRunning">Simulator</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l564"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:564</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Checks if it is running.</p>
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Boolean</span>:
+                    
+                    true, if it is, false otherwise
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_removeEventListener" class="method item inherited">
+    <h3 class="name"><code>removeEventListener</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;EventSimulator.html#method_removeEventListener">EventSimulator</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l765"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:765</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Template method to remove an event listener for the specified Event.</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_removeObserver" class="method item inherited">
+    <h3 class="name"><code>removeObserver</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>observer</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;Observable.html#method_removeObserver">Observable</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l153"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:153</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Removes an Observer. If it is not already registered, it will not have no
+effect.</p>
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">observer</code>
+                        <span class="type"><a href="../classes/Observer.html" class="crosslink">Observer</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The observer to remove</p>
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_stop" class="method item inherited">
+    <h3 class="name"><code>stop</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;Simulator.html#method_stop">Simulator</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l553"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:553</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Finishes the simulation even if its running. Doesn't do anything if not.</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_updateObservers" class="method item inherited">
+    <h3 class="name"><code>updateObservers</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>args</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;Observable.html#method_updateObservers">Observable</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l124"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:124</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Updates all Observers this the specified arguments.</p>
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">args</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The arguments to pass to the Observers</p>
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+            </div>
+        
+
+        
+            <div id="properties" class="api-class-tabpanel">
+                <h2 class="off-left">Properties</h2>
+
+                
+                    <div id="property_$element" class="property item inherited">
+    <h3 class="name"><code>$element</code></h3>
+    <span class="type">JQuery</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;EventSimulator.html#property_$element">EventSimulator</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l714"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:714</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The jQuery element on which to dispatch the event.</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_event" class="property item inherited">
+    <h3 class="name"><code>event</code></h3>
+    <span class="type">Event</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;EventSimulator.html#property_event">EventSimulator</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l736"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:736</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The Event that is dispatched.</p>
+    </div>
+
+    
+        <p><strong>Default:</strong> null</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_listener" class="property item inherited">
+    <h3 class="name"><code>listener</code></h3>
+    <span class="type">Function</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;EventSimulator.html#property_listener">EventSimulator</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l728"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:728</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The listener to add and remove.</p>
+    </div>
+
+    
+        <p><strong>Default:</strong> function () {}</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_observers" class="property item inherited">
+    <h3 class="name"><code>observers</code></h3>
+    <span class="type">Array</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;Observable.html#property_observers">Observable</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l115"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:115</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The Observers.</p>
+    </div>
+
+    
+        <p><strong>Default:</strong> []</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_running" class="property item inherited">
+    <h3 class="name"><code>running</code></h3>
+    <span class="type">Boolean</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;Simulator.html#property_running">Simulator</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l519"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:519</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>true, if it is running.</p>
+    </div>
+
+    
+        <p><strong>Default:</strong> false</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_simulaEvent" class="property item inherited">
+    <h3 class="name"><code>simulaEvent</code></h3>
+    <span class="type"><a href="../classes/SimulaEvent.html" class="crosslink">SimulaEvent</a></span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;EventSimulator.html#property_simulaEvent">EventSimulator</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l721"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:721</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The SimulaEvent to init and dispatch.</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+            </div>
         
 
         

@@ -1,12 +1,13 @@
 YUI.add("yuidoc-meta", function(Y) {
    Y.YUIDoc = { meta: {
     "classes": [
+        ".",
         "EventSimulator",
         "Observable",
         "Observer",
         "SimulaEvent",
         "SimulaMouseEvent",
-        "SimulaUIEvent",
+        "SimulaUiEvent",
         "Simulation",
         "Simulator",
         "SimulatorQueue",

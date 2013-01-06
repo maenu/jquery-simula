@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>SimulaUIEvent - jquery-simula</title>
+    <title>SimulaUiEvent - jquery-simula</title>
     <link rel="stylesheet" href="http:&#x2F;&#x2F;yui.yahooapis.com&#x2F;3.8.0pr2&#x2F;build&#x2F;cssgrids&#x2F;cssgrids-min.css">
     <link rel="stylesheet" href="..&#x2F;assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="..&#x2F;assets/css/main.css" id="site_styles">
@@ -41,6 +41,8 @@
         <div id="api-tabview-panel">
             <ul id="api-classes" class="apis classes">
             
+                <li><a href="..&#x2F;classes/..html">.</a></li>
+            
                 <li><a href="..&#x2F;classes/EventSimulator.html">EventSimulator</a></li>
             
                 <li><a href="..&#x2F;classes/jQuery.html">jQuery</a></li>
@@ -61,7 +63,7 @@
             
                 <li><a href="..&#x2F;classes/SimulatorQueue.html">SimulatorQueue</a></li>
             
-                <li><a href="..&#x2F;classes/SimulaUIEvent.html">SimulaUIEvent</a></li>
+                <li><a href="..&#x2F;classes/SimulaUiEvent.html">SimulaUiEvent</a></li>
             
                 <li><a href="..&#x2F;classes/TimeSimulator.html">TimeSimulator</a></li>
             
@@ -110,10 +112,14 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>SimulaUIEvent Class</h1>
+                        <h1>SimulaUiEvent Class</h1>
 <div class="box meta">
     
 
+    
+        <div class="extends">
+            Extends <a href="../classes/SimulaEvent.html" class="crosslink">SimulaEvent</a>
+        </div>
     
 
     
@@ -134,15 +140,15 @@
 
 
 <div class="box intro">
-    <p>Creates an SimulaUIEvent. Properties are taken from
-http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-SimulaUIEvent.</p>
+    <p>Creates an SimulaUiEvent. Properties are taken from
+http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-SimulaUiEvent.</p>
 </div>
 
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_SimulaUIEvent" class="method item">
-    <h3 class="name"><code>SimulaUIEvent</code></h3>
+        <div id="method_SimulaUiEvent" class="method item">
+    <h3 class="name"><code>SimulaUiEvent</code></h3>
 
     
         <div class="args">
@@ -253,10 +259,31 @@ http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-SimulaUIEvent.</p>
                 <div class="index-section properties">
                     <h3>Properties</h3>
 
-                    <ul class="index-list properties">
+                    <ul class="index-list properties extends">
+                        
+                            <li class="index-item property inherited">
+                                <a href="#property_bubbles">bubbles</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property inherited">
+                                <a href="#property_cancelable">cancelable</a>
+
+                                
+                                
+                            </li>
                         
                             <li class="index-item property">
                                 <a href="#property_detail">detail</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property inherited">
+                                <a href="#property_type">type</a>
 
                                 
                                 
@@ -285,6 +312,95 @@ http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-SimulaUIEvent.</p>
                 <h2 class="off-left">Properties</h2>
 
                 
+                    <div id="property_bubbles" class="property item inherited">
+    <h3 class="name"><code>bubbles</code></h3>
+    <span class="type">Boolean</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;SimulaEvent.html#property_bubbles">SimulaEvent</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l197"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:197</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Used to indicate whether or not an event is a bubbling event. If the
+event can bubble the value is true, else the value is false.</p>
+    </div>
+
+    
+        <p><strong>Default:</strong> true</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_cancelable" class="property item inherited">
+    <h3 class="name"><code>cancelable</code></h3>
+    <span class="type">Boolean</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;SimulaEvent.html#property_cancelable">SimulaEvent</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l206"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:206</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Used to indicate whether or not an event can have its default action
+prevented. If the default action can be prevented the value is true,
+else the value is false.</p>
+    </div>
+
+    
+        <p><strong>Default:</strong> true</p>
+    
+
+    
+
+    
+</div>
+
+                
                     <div id="property_detail" class="property item">
     <h3 class="name"><code>detail</code></h3>
     <span class="type">Number</span>
@@ -308,7 +424,7 @@ http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-SimulaUIEvent.</p>
             
         
         
-        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l275"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:275</code></a>
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l276"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:276</code></a>
         
         </p>
 
@@ -324,6 +440,48 @@ type of event.</p>
 
     
         <p><strong>Default:</strong> 0</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_type" class="property item inherited">
+    <h3 class="name"><code>type</code></h3>
+    <span class="type">String</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;SimulaEvent.html#property_type">SimulaEvent</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l189"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:189</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The name of the event (case-insensitive). The name must be an XML
+name.</p>
+    </div>
+
     
 
     
@@ -355,7 +513,7 @@ type of event.</p>
             
         
         
-        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l266"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:266</code></a>
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l267"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:267</code></a>
         
         </p>
 

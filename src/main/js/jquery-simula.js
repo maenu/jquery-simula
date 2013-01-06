@@ -8,28 +8,13 @@
 
 (function ($, undefined) {
 	
-	/**
-	 * Checks if the other's first DOM element is the same as the calling one.
-	 *
-	 * @for jQuery
-	 * @method equals
-	 *
-	 * @param {jQuery} other A jQuery object
-	 *
-	 * @return {Boolean} true, if the first DOM element is the same, false
-	 *     otherwise
-	 */
-	$.fn.equals = function (other) {
-		return this[0] == $(other)[0];
-	};
-	
 	var check = false;
 	var isRelative = true;
 	
 	/**
 	 * Gets the DOM element from point, as in the W3C description.
 	 *
-	 * @for jQuery
+	 * @for .
 	 * @method elementFromPoint
 	 *
 	 * @param {Number} clientX The clientX coordinate
@@ -64,6 +49,21 @@
 			clientY += $(document).scrollTop();
 		}
 		return document.elementFromPoint(clientX, clientY);
+	};
+	
+	/**
+	 * Checks if the other's first DOM element is the same as the calling one.
+	 *
+	 * @for jQuery
+	 * @method equals
+	 *
+	 * @param {jQuery} other A jQuery object
+	 *
+	 * @return {Boolean} true, if the first DOM element is the same, false
+	 *     otherwise
+	 */
+	$.fn.equals = function (other) {
+		return this[0] == $(other)[0];
 	};
 	
 	/**
@@ -245,17 +245,18 @@
 	};
 	
 	/**
-	 * Creates an SimulaUIEvent. Properties are taken from
-	 * http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-SimulaUIEvent.
+	 * Creates an SimulaUiEvent. Properties are taken from
+	 * http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-SimulaUiEvent.
 	 *
 	 * @for jQuery.simula
-	 * @class SimulaUIEvent
+	 * @class SimulaUiEvent
+	 * @extends SimulaEvent
 	 * @constructor
 	 *
 	 * @param {Object} options The options to use for the event. If some
 	 *     properties are missing, the default values are used.
 	 */
-	function SimulaUIEvent(options) {
+	function SimulaUiEvent(options) {
 		SimulaEvent.apply(this, [options]);
 		
 		var fullOptions = $.extend({}, {
@@ -282,8 +283,8 @@
 		 */
 		this.detail = fullOptions.detail;
 	}
-	SimulaUIEvent.prototype = new SimulaEvent();
-	SimulaUIEvent.prototype.constructor = SimulaUIEvent;
+	SimulaUiEvent.prototype = new SimulaEvent();
+	SimulaUiEvent.prototype.constructor = SimulaUiEvent;
 	
 	/**
 	 * Creates a SimulaMouseEvent. Properties are taken from
@@ -292,13 +293,14 @@
 	 *
 	 * @for jQuery.simula
 	 * @class SimulaMouseEvent
+	 * @extends SimulaUiEvent
 	 * @constructor
 	 *
 	 * @param {Object} options The options to use for the event. If some
 	 *     properties are missing, the default values are used.
 	 */
 	function SimulaMouseEvent(options) {
-		SimulaUIEvent.apply(this, [options]);
+		SimulaUiEvent.apply(this, [options]);
 		
 		var fullOptions = $.extend({}, {
 			screenX: 0,
@@ -415,7 +417,7 @@
 		 */
 		this.relatedTarget = fullOptions.relatedTarget;
 	}
-	SimulaMouseEvent.prototype = new SimulaUIEvent();
+	SimulaMouseEvent.prototype = new SimulaUiEvent();
 	SimulaMouseEvent.prototype.constructor = SimulaMouseEvent;
 	SimulaMouseEvent.BUTTON = {
 		/**
@@ -508,6 +510,7 @@
 	 *
 	 * @for jQuery.simula
 	 * @class Simulator
+	 * @extends Observable
 	 * @constructor
 	 */
 	function Simulator() {
@@ -574,6 +577,7 @@
 	 *
 	 * @for jQuery.simula
 	 * @class SimulatorQueue
+	 * @extends Simulator
 	 * @constructor
 	 *
 	 * @param {Array} simulators An ordered Array of Simulators which will be
@@ -651,6 +655,7 @@
 	 *
 	 * @for jQuery.simula
 	 * @class TimeSimulator
+	 * @extends Simulator
 	 * @constructor
 	 *
 	 * @param {Number} time The amount of milliseconds to wait before the
@@ -696,6 +701,7 @@
 	 *
 	 * @for jQuery.simula
 	 * @class EventSimulator
+	 * @extends Simulator
 	 * @constructor
 	 *
 	 * @param {jQuery} $element The jQuery element on which to dispatch the
@@ -803,6 +809,7 @@
 	 *
 	 * @for jQuery.simula
 	 * @class W3CMouseEventSimulator
+	 * @extends EventSimulator
 	 * @constructor
 	 *
 	 * @param {jQuery} $element The jQuery element on which to dispatch the
@@ -860,6 +867,7 @@
 	 *
 	 * @for jQuery.simula
 	 * @class Simulation
+	 * @extends Simulator
 	 * @constructor
 	 *
 	 * @param {jQuery} $element The jQuery element over which the mouse is
@@ -1369,7 +1377,7 @@
 	$.simula.TimeSimulator = TimeSimulator;
 	$.simula.EventSimulator = EventSimulator;
 	$.simula.SimulaEvent = SimulaEvent;
-	$.simula.SimulaUIEvent = SimulaUIEvent;
+	$.simula.SimulaUiEvent = SimulaUiEvent;
 	$.simula.SimulaMouseEvent = SimulaMouseEvent;
 	$.simula.MouseEventSimulator = MouseEventSimulator;
 	$.simula.Simulation = Simulation;

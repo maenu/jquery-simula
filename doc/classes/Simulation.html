@@ -41,6 +41,8 @@
         <div id="api-tabview-panel">
             <ul id="api-classes" class="apis classes">
             
+                <li><a href="..&#x2F;classes/..html">.</a></li>
+            
                 <li><a href="..&#x2F;classes/EventSimulator.html">EventSimulator</a></li>
             
                 <li><a href="..&#x2F;classes/jQuery.html">jQuery</a></li>
@@ -61,7 +63,7 @@
             
                 <li><a href="..&#x2F;classes/SimulatorQueue.html">SimulatorQueue</a></li>
             
-                <li><a href="..&#x2F;classes/SimulaUIEvent.html">SimulaUIEvent</a></li>
+                <li><a href="..&#x2F;classes/SimulaUiEvent.html">SimulaUiEvent</a></li>
             
                 <li><a href="..&#x2F;classes/TimeSimulator.html">TimeSimulator</a></li>
             
@@ -115,10 +117,14 @@
     
 
     
+        <div class="extends">
+            Extends <a href="../classes/Simulator.html" class="crosslink">Simulator</a>
+        </div>
+    
 
     
         <div class="foundat">
-            Defined in: <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l855"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:855</code></a>
+            Defined in: <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l862"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:862</code></a>
         </div>
     
 
@@ -191,7 +197,7 @@ stay the same during execution.</p>
             
         
         
-        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l855"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:855</code></a>
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l862"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:862</code></a>
         
         </p>
 
@@ -276,7 +282,14 @@ stay the same during execution.</p>
                 <div class="index-section methods">
                     <h3>Methods</h3>
 
-                    <ul class="index-list methods">
+                    <ul class="index-list methods extends">
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_addObserver">addObserver</a>
+
+                                
+                                
+                            </li>
                         
                             <li class="index-item method">
                                 <a href="#method_click">click</a>
@@ -287,6 +300,27 @@ stay the same during execution.</p>
                         
                             <li class="index-item method">
                                 <a href="#method_enter">enter</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_execute">execute</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_finish">finish</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_isRunning">isRunning</a>
 
                                 
                                 
@@ -362,6 +396,27 @@ stay the same during execution.</p>
                                 
                             </li>
                         
+                            <li class="index-item method inherited">
+                                <a href="#method_removeObserver">removeObserver</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_stop">stop</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_updateObservers">updateObservers</a>
+
+                                
+                                
+                            </li>
+                        
                             <li class="index-item method">
                                 <a href="#method_wait">wait</a>
 
@@ -377,7 +432,7 @@ stay the same during execution.</p>
                 <div class="index-section properties">
                     <h3>Properties</h3>
 
-                    <ul class="index-list properties">
+                    <ul class="index-list properties extends">
                         
                             <li class="index-item property">
                                 <a href="#property_$element">$element</a>
@@ -388,6 +443,20 @@ stay the same during execution.</p>
                         
                             <li class="index-item property">
                                 <a href="#property_elementPosition">elementPosition</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property inherited">
+                                <a href="#property_observers">observers</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item property inherited">
+                                <a href="#property_running">running</a>
 
                                 
                                 
@@ -412,6 +481,91 @@ stay the same during execution.</p>
         
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
+
+                
+                    <div id="method_addObserver" class="method item inherited">
+    <h3 class="name"><code>addObserver</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>observer</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;Observable.html#method_addObserver">Observable</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l136"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:136</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Adds an Observer. If it is already registered, it will not be added
+again.</p>
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">observer</code>
+                        <span class="type"><a href="../classes/Observer.html" class="crosslink">Observer</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The observer to add</p>
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
 
                 
                     <div id="method_click" class="method item">
@@ -466,7 +620,7 @@ stay the same during execution.</p>
             
         
         
-        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l1334"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:1334</code></a>
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l1342"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:1342</code></a>
         
         </p>
 
@@ -594,7 +748,7 @@ stay the same during execution.</p>
             
         
         
-        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l1181"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:1181</code></a>
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l1189"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:1189</code></a>
         
         </p>
 
@@ -669,6 +823,177 @@ stay the same during execution.</p>
 </div>
 
                 
+                    <div id="method_execute" class="method item inherited">
+    <h3 class="name"><code>execute</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;Simulator.html#method_execute">Simulator</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l539"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:539</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Starts the the simulation, i.e. dispatches events. Must call finish, at
+the end.</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_finish" class="method item inherited">
+    <h3 class="name"><code>finish</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;Simulator.html#method_finish">Simulator</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l530"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:530</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Updates all Observers with 'finish'.</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_isRunning" class="method item inherited">
+    <h3 class="name"><code>isRunning</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Boolean</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;Simulator.html#method_isRunning">Simulator</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l564"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:564</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Checks if it is running.</p>
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Boolean</span>:
+                    
+                    true, if it is, false otherwise
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
                     <div id="method_leave" class="method item">
     <h3 class="name"><code>leave</code></h3>
 
@@ -721,7 +1046,7 @@ stay the same during execution.</p>
             
         
         
-        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l1231"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:1231</code></a>
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l1239"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:1239</code></a>
         
         </p>
 
@@ -849,7 +1174,7 @@ stay the same during execution.</p>
             
         
         
-        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l1067"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:1067</code></a>
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l1075"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:1075</code></a>
         
         </p>
 
@@ -977,7 +1302,7 @@ stay the same during execution.</p>
             
         
         
-        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l1009"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:1009</code></a>
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l1017"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:1017</code></a>
         
         </p>
 
@@ -1105,7 +1430,7 @@ stay the same during execution.</p>
             
         
         
-        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l927"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:927</code></a>
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l935"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:935</code></a>
         
         </p>
 
@@ -1233,7 +1558,7 @@ stay the same during execution.</p>
             
         
         
-        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l982"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:982</code></a>
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l990"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:990</code></a>
         
         </p>
 
@@ -1361,7 +1686,7 @@ stay the same during execution.</p>
             
         
         
-        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l955"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:955</code></a>
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l963"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:963</code></a>
         
         </p>
 
@@ -1489,7 +1814,7 @@ stay the same during execution.</p>
             
         
         
-        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l1038"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:1038</code></a>
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l1046"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:1046</code></a>
         
         </p>
 
@@ -1629,7 +1954,7 @@ stay the same during execution.</p>
             
         
         
-        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l1096"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:1096</code></a>
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l1104"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:1104</code></a>
         
         </p>
 
@@ -1792,7 +2117,7 @@ dispatching a mousemove every 15 milliseconds.</p>
             
         
         
-        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l1278"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:1278</code></a>
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l1286"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:1286</code></a>
         
         </p>
 
@@ -1920,7 +2245,7 @@ dispatching a mousemove every 15 milliseconds.</p>
             
         
         
-        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l1306"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:1306</code></a>
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l1314"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:1314</code></a>
         
         </p>
 
@@ -1996,6 +2321,226 @@ dispatching a mousemove every 15 milliseconds.</p>
 </div>
 
                 
+                    <div id="method_removeObserver" class="method item inherited">
+    <h3 class="name"><code>removeObserver</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>observer</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;Observable.html#method_removeObserver">Observable</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l153"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:153</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Removes an Observer. If it is not already registered, it will not have no
+effect.</p>
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">observer</code>
+                        <span class="type"><a href="../classes/Observer.html" class="crosslink">Observer</a></span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The observer to remove</p>
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_stop" class="method item inherited">
+    <h3 class="name"><code>stop</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;Simulator.html#method_stop">Simulator</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l553"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:553</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Finishes the simulation even if its running. Doesn't do anything if not.</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_updateObservers" class="method item inherited">
+    <h3 class="name"><code>updateObservers</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>args</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;Observable.html#method_updateObservers">Observable</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l124"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:124</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Updates all Observers this the specified arguments.</p>
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">args</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The arguments to pass to the Observers</p>
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
                     <div id="method_wait" class="method item">
     <h3 class="name"><code>wait</code></h3>
 
@@ -2042,7 +2587,7 @@ dispatching a mousemove every 15 milliseconds.</p>
             
         
         
-        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l910"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:910</code></a>
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l918"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:918</code></a>
         
         </p>
 
@@ -2132,7 +2677,7 @@ dispatching a mousemove every 15 milliseconds.</p>
             
         
         
-        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l881"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:881</code></a>
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l889"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:889</code></a>
         
         </p>
 
@@ -2176,7 +2721,7 @@ dispatching a mousemove every 15 milliseconds.</p>
             
         
         
-        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l888"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:888</code></a>
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l896"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:896</code></a>
         
         </p>
 
@@ -2189,6 +2734,92 @@ dispatching a mousemove every 15 milliseconds.</p>
         <p>The mouse position relative to the specified element.</p>
     </div>
 
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_observers" class="property item inherited">
+    <h3 class="name"><code>observers</code></h3>
+    <span class="type">Array</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;Observable.html#property_observers">Observable</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l115"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:115</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>The Observers.</p>
+    </div>
+
+    
+        <p><strong>Default:</strong> []</p>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_running" class="property item inherited">
+    <h3 class="name"><code>running</code></h3>
+    <span class="type">Boolean</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;Simulator.html#property_running">Simulator</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l519"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:519</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>true, if it is running.</p>
+    </div>
+
+    
+        <p><strong>Default:</strong> false</p>
     
 
     
@@ -2222,7 +2853,7 @@ dispatching a mousemove every 15 milliseconds.</p>
             
         
         
-        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l872"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:872</code></a>
+        <a href="..&#x2F;files&#x2F;src_main_js_jquery-simula.js.html#l880"><code>src&#x2F;main&#x2F;js&#x2F;jquery-simula.js:880</code></a>
         
         </p>
 

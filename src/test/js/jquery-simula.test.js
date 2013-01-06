@@ -860,12 +860,12 @@ describe('jquery.simula', function () {
 		
 	});
 	
-	describe('simula.SimulaUIEvent', function () {
+	describe('simula.SimulaUiEvent', function () {
 		
 		var uiEvent;
 		
 		beforeEach(function () {
-			uiEvent = new $.simula.SimulaUIEvent({});
+			uiEvent = new $.simula.SimulaUiEvent({});
 		});
 		
 		describe('default options', function () {
@@ -880,7 +880,7 @@ describe('jquery.simula', function () {
 		describe('partially overriden options', function () {
 			
 			beforeEach(function () {
-				uiEvent = new $.simula.SimulaUIEvent({
+				uiEvent = new $.simula.SimulaUiEvent({
 					detail: 1
 				});
 			});
@@ -895,7 +895,7 @@ describe('jquery.simula', function () {
 		describe('full overriden options', function () {
 			
 			beforeEach(function () {
-				uiEvent = new $.simula.SimulaUIEvent({
+				uiEvent = new $.simula.SimulaUiEvent({
 					view: document,
 					detail: 1
 				});
