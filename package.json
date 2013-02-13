@@ -17,12 +17,12 @@
     "url": "https://github.com/maenu/jquery-simula.git"
   },
   "devDependencies": {
-    "grunt": "~0.4.0",
-    "grunt-istanbul": "git://github.com/taichi/grunt-istanbul.git",
-    "grunt-contrib-jshint": "~0.1.0",
-    "grunt-contrib-jasmine": "~0.2.0",
-    "grunt-contrib-clean": "~0.4.0a",
-    "grunt-contrib-uglify": "~0.1.0",
-    "grunt-contrib-yuidoc": "~0.3.2"
+    "grunt": "0.4.0rc7",
+    "grunt-contrib-jshint": "*",
+    "grunt-contrib-jasmine": "*",
+    "grunt-contrib-clean": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-yuidoc": "*",
+    "grunt-template-jasmine-istanbul": "*"
   }
 }

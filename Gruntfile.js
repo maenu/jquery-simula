@@ -1,5 +1,5 @@
 module.exports = function(grunt) {
-    grunt.initConfig({
+	grunt.initConfig({
 		meta: {
 			package: grunt.file.readJSON('package.json'),
 			src: {
@@ -10,39 +10,28 @@ module.exports = function(grunt) {
 				coverage: 'bin/coverage'
 			},
 			doc: 'doc',
-			lib: 'lib'
+			lib: {
+				main: 'lib/main'
+			}
 		},
 		clean: {
 			bin: 'bin',
 			doc: 'doc'
 		},
-        jasmine: {
-            src: '<%= meta.src.main %>/js/*.js',
-			coverage: '<%= meta.bin.coverage %>/<%= meta.src.main %>/js/*.js',
-            options: {
-				vendor: '<%= meta.lib %>/jquery-1.8.3.min.js',
-                template: '<%= meta.src.test %>/html/Coverage.tmpl',
-                specs: '<%= meta.src.test %>/js/*.js'
-            }
-        },
-        instrument : {
-            files : '<%= meta.src.main %>/js/*.js',
-            options : {
-                basePath : '<%= meta.bin.coverage %>'
-            }
-        },
-        storeCoverage : {
-            options : {
-                dir : '<%= meta.bin.coverage %>'
-            }
-        },
-        makeReport : {
-            src : '<%= meta.bin.coverage %>/*.json',
-            options : {
-                type : 'lcov',
-                dir : '<%= meta.bin.coverage %>'
-            }
-        },
+		jasmine: {
+			coverage: {
+				src: '<%= meta.src.main %>/js/*.js',
+				options: {
+					specs: '<%= meta.src.test %>/js/*.js',
+					vendor: '<%= meta.lib.main %>/*.js',
+					template: require('grunt-template-jasmine-istanbul'),
+					templateOptions: {
+						coverage: '<%= meta.bin.coverage %>/coverage.json',
+						report: '<%= meta.bin.coverage %>'
+					}
+				}
+			}
+		},
 		uglify: {
 			options: {
 				banner: '/**\n'
@@ -69,64 +58,56 @@ module.exports = function(grunt) {
 				}
 			}
 		},
-        jshint: {
+		jshint: {
 			main: '<%= meta.src.main %>/js/*.js',
 			test: '<%= meta.src.test %>/js/*.js',
-            options: {
-                // restrict
-                bitwise: false,
-                camelcase: true,
-                curly: true,
-                eqeqeq: false,
-                forin: true,
-                immed: true,
-                indent: 4,
-                latedef: true,
-                newcap: true,
-                noarg: true,
-                noempty: true,
-                nonew: true,
-                plusplus: false,
-                quotmark: 'single',
-                regexp: true,
-                undef: true,
-                unused: true,
-                strict: false,
-                trailing: true,
-                maxparams: 5,
-                maxdepth: 3,
-                maxstatements: 42,
-                maxcomplexity: 5,
-                maxlen: 80,
-                // relax
-                sub: true,
-                eqnull: true,
-                laxbreak: true, // break on + etc.
+			options: {
+				// restrict
+				bitwise: false,
+				camelcase: true,
+				curly: true,
+				eqeqeq: false,
+				forin: true,
+				immed: true,
+				indent: 4,
+				latedef: true,
+				newcap: true,
+				noarg: true,
+				noempty: true,
+				nonew: true,
+				plusplus: false,
+				quotmark: 'single',
+				regexp: true,
+				undef: true,
+				unused: true,
+				strict: false,
+				trailing: true,
+				maxparams: 5,
+				maxdepth: 3,
+				maxstatements: 42,
+				maxcomplexity: 5,
+				maxlen: 80,
+				// relax
+				sub: true,
+				eqnull: true,
+				laxbreak: true, // break on + etc.
 				// environments
 				browser: true,
 				globals: {
 					'jQuery': true
 				}
-            }
-        }
-    });
-    
-    grunt.loadNpmTasks('grunt-istanbul');
-    grunt.loadNpmTasks('grunt-contrib-jasmine');
-    grunt.loadNpmTasks('grunt-contrib-jshint');
+			}
+		}
+	});
+	
+	grunt.loadNpmTasks('grunt-contrib-jasmine');
+	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-yuidoc');
 	
 	grunt.registerTask('checkStyle', ['jshint:main', 'jshint:test']);
-	grunt.registerTask('test', 'jasmine:src');
-	grunt.registerTask('coverage', ['instrument', 'jasmine:coverage',
-			'storeCoverage', 'makeReport']);
+	grunt.registerTask('test:coverage', 'jasmine:coverage');
 	grunt.registerTask('min', 'uglify:min');		
 	grunt.registerTask('doc', 'yuidoc');
-    
-    // needed to make grunt-istanbul storeReport
-    grunt.event.on('jasmine.coverage', function (coverage) {
-        global.__coverage__ = coverage
-    });
 };
