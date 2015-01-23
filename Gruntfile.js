@@ -9,10 +9,7 @@ module.exports = function(grunt) {
 			bin: {
 				coverage: 'bin/coverage'
 			},
-			doc: 'doc',
-			lib: {
-				main: 'lib/main'
-			}
+			doc: 'doc'
 		},
 		clean: {
 			bin: 'bin',
@@ -23,11 +20,23 @@ module.exports = function(grunt) {
 				src: '<%= meta.src.main %>/js/*.js',
 				options: {
 					specs: '<%= meta.src.test %>/js/*.js',
-					vendor: '<%= meta.lib.main %>/*.js',
+					vendor: [
+						'node_modules/jquery/dist/jquery.js'
+					],
 					template: require('grunt-template-jasmine-istanbul'),
 					templateOptions: {
 						coverage: '<%= meta.bin.coverage %>/coverage.json',
-						report: '<%= meta.bin.coverage %>'
+						report: [
+							{
+								type: 'cobertura',
+								options: {
+									dir: 'bin/coverage/cobertura'
+								}
+							},
+							{
+								type: 'text-summary'
+							}
+						]
 					}
 				}
 			}

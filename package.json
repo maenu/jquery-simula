@@ -16,8 +16,11 @@
     "type": "git",
     "url": "https://github.com/maenu/jquery-simula.git"
   },
+  "dependencies": {
+	  "jquery": "*"
+  },
   "devDependencies": {
-    "grunt": "0.4.0rc7",
+    "grunt": "*",
     "grunt-contrib-jshint": "*",
     "grunt-contrib-jasmine": "*",
     "grunt-contrib-clean": "*",

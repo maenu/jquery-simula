@@ -6,10 +6,7 @@
 	expect: true,
 	beforeEach: true,
 	afterEach: true,
-	spyOn: true,
-	waits: true,
-	waitsFor: true,
-	runs: true
+	spyOn: true
 */
 /**
  * Tests the simula module for jQuery.
@@ -303,8 +300,8 @@ describe('jquery.simula', function () {
 		describe('execute', function () {
 			
 			it('should update its Observers on execute then finish', function () {
-				spyOn(simulator, 'finish').andCallThrough();
-				spyOn(observer, 'updateObservable').andCallThrough();
+				spyOn(simulator, 'finish').and.callThrough();
+				spyOn(observer, 'updateObservable').and.callThrough();
 				simulator.addObserver(observer);
 				expect(simulator.isRunning()).toBeFalsy();
 				expect(simulator.finish).not.toHaveBeenCalled();
@@ -320,7 +317,7 @@ describe('jquery.simula', function () {
 			});
 			
 			it('should throw an error when trying to execute while running', function () {
-				spyOn(simulator, 'finish').andCallThrough();
+				spyOn(simulator, 'finish').and.callThrough();
 				simulator.execute();
 				expect(function () {
 					simulator.execute();
@@ -332,7 +329,7 @@ describe('jquery.simula', function () {
 		describe('stop', function () {
 			
 			it('should do nothing if not running', function () {
-				spyOn(observer, 'updateObservable').andCallThrough();
+				spyOn(observer, 'updateObservable').and.callThrough();
 				simulator.addObserver(observer);
 				expect(simulator.isRunning()).toBeFalsy();
 				expect(observer.updateObservable).not.toHaveBeenCalled();
@@ -342,7 +339,7 @@ describe('jquery.simula', function () {
 			});
 			
 			it('should update with stop if running', function () {
-				spyOn(observer, 'updateObservable').andCallThrough();
+				spyOn(observer, 'updateObservable').and.callThrough();
 				simulator.addObserver(observer);
 				simulator.running = true;
 				expect(simulator.isRunning()).toBeTruthy();
@@ -363,49 +360,40 @@ describe('jquery.simula', function () {
 		
 		beforeEach(function () {
 			timeSimulator = new $.simula.TimeSimulator(50);
+			jasmine.clock().install();
 		});
 		
 		afterEach(function () {
 			timeSimulator.stop();
+			jasmine.clock().uninstall();
 		});
 		
 		it('should finish after the interval', function () {
-			runs(function () {
-				spyOn(timeSimulator, 'finish').andCallThrough();
-				expect(timeSimulator.finish).not.toHaveBeenCalled();
-				expect(timeSimulator.isRunning()).toBeFalsy();
-				beforeExecution = new Date();
-				timeSimulator.execute();
-				expect(timeSimulator.finish).not.toHaveBeenCalled();
-				expect(timeSimulator.isRunning()).toBeTruthy();
-			});
-			waitsFor(function () {
-				return timeSimulator.finish.callCount == 1;
-			}, 'finish to be called', 100);
-			runs(function () {
-				expect((new Date()).getTime() - beforeExecution.getTime()).toBeGreaterThan(40);
-				expect(timeSimulator.finish).toHaveBeenCalled();
-				expect(timeSimulator.isRunning()).toBeFalsy();
-			});
+			spyOn(timeSimulator, 'finish').and.callThrough();
+			expect(timeSimulator.finish).not.toHaveBeenCalled();
+			expect(timeSimulator.isRunning()).toBeFalsy();
+			timeSimulator.execute();
+			expect(timeSimulator.finish).not.toHaveBeenCalled();
+			expect(timeSimulator.isRunning()).toBeTruthy();
+			jasmine.clock().tick(51);
+			expect(timeSimulator.finish.calls.count()).toEqual(1);
+			expect(timeSimulator.finish).toHaveBeenCalled();
+			expect(timeSimulator.isRunning()).toBeFalsy();
 		});
 			
 		it('should clear the interval on stop', function () {
-			runs(function () {
-				this.observer = new $.simula.Observer();
-				spyOn(this.observer, 'updateObservable').andCallThrough();
-				timeSimulator.addObserver(this.observer);
-				timeSimulator.execute();
-				expect(timeSimulator.isRunning()).toBeTruthy();
-				expect(this.observer.updateObservable).not.toHaveBeenCalled();
-				timeSimulator.stop();
-				expect(timeSimulator.isRunning()).toBeFalsy();
-				expect(this.observer.updateObservable).toHaveBeenCalledWith(timeSimulator, 'stop');
-				this.observer.updateObservable.reset();
-			});
-			waits(200);
-			runs(function () {
-				expect(this.observer.updateObservable).not.toHaveBeenCalled();
-			});
+			this.observer = new $.simula.Observer();
+			spyOn(this.observer, 'updateObservable').and.callThrough();
+			timeSimulator.addObserver(this.observer);
+			timeSimulator.execute();
+			expect(timeSimulator.isRunning()).toBeTruthy();
+			expect(this.observer.updateObservable).not.toHaveBeenCalled();
+			timeSimulator.stop();
+			expect(timeSimulator.isRunning()).toBeFalsy();
+			expect(this.observer.updateObservable).toHaveBeenCalledWith(timeSimulator, 'stop');
+			this.observer.updateObservable.calls.reset();
+			jasmine.clock().tick(51);
+			expect(this.observer.updateObservable).not.toHaveBeenCalled();
 		});
 		
 	});
@@ -418,34 +406,22 @@ describe('jquery.simula', function () {
 		TestSimulator.prototype = new $.simula.Simulator();
 		TestSimulator.prototype.constructor = TestSimulator;
 		TestSimulator.prototype.execute = function () {
-			beforeExecution = new Date();
 			$.simula.Simulator.prototype.execute.apply(this);
 			this.finish();
 		};
 		
-		function TestTimeSimulator(id, time) {
-			$.simula.TimeSimulator.apply(this, [time]);
-			this.id = id;
-		}
-		TestTimeSimulator.prototype = new $.simula.TimeSimulator();
-		TestTimeSimulator.prototype.constructor = TestTimeSimulator;
-		TestTimeSimulator.prototype.execute = function () {
-			beforeExecution[this.id] = new Date();
-			$.simula.TimeSimulator.prototype.execute.apply(this);
-		};
-		
 		var observer;
 		var simulatorQueue;
-		var beforeExecution;
 		
 		beforeEach(function () {
 			observer = new $.simula.Observer();
 			simulatorQueue = new $.simula.SimulatorQueue([]);
-			beforeExecution = {};
+			jasmine.clock().install();
 		});
 		
 		afterEach(function () {
 			simulatorQueue.stop();
+			jasmine.clock().uninstall();
 		});
 		
 		describe('empty SimulatorQueue', function () {
@@ -455,8 +431,8 @@ describe('jquery.simula', function () {
 			});
 			
 			it('should just finish on execute', function () {
-				spyOn(simulatorQueue, 'finish').andCallThrough();
-				spyOn(observer, 'updateObservable').andCallThrough();
+				spyOn(simulatorQueue, 'finish').and.callThrough();
+				spyOn(observer, 'updateObservable').and.callThrough();
 				simulatorQueue.addObserver(observer);
 				expect(simulatorQueue.finish).not.toHaveBeenCalled();
 				expect(observer.updateObservable).not.toHaveBeenCalled();
@@ -482,10 +458,10 @@ describe('jquery.simula', function () {
 			});
 			
 			it('should update the Observers after executing Simulators', function () {
-				spyOn(simulator, 'execute').andCallThrough();
-				spyOn(simulator, 'finish').andCallThrough();
-				spyOn(simulatorQueue, 'finish').andCallThrough();
-				spyOn(observer, 'updateObservable').andCallThrough();
+				spyOn(simulator, 'execute').and.callThrough();
+				spyOn(simulator, 'finish').and.callThrough();
+				spyOn(simulatorQueue, 'finish').and.callThrough();
+				spyOn(observer, 'updateObservable').and.callThrough();
 				simulatorQueue.addObserver(observer);
 				expect(simulator.execute).not.toHaveBeenCalled();
 				expect(simulator.finish).not.toHaveBeenCalled();
@@ -521,14 +497,14 @@ describe('jquery.simula', function () {
 			});
 			
 			it('should update the Observers after executing the Simulators', function () {
-				spyOn(simulator1, 'execute').andCallThrough();
-				spyOn(simulator1, 'finish').andCallThrough();
-				spyOn(simulator2, 'execute').andCallThrough();
-				spyOn(simulator2, 'finish').andCallThrough();
-				spyOn(simulator3, 'execute').andCallThrough();
-				spyOn(simulator3, 'finish').andCallThrough();
-				spyOn(simulatorQueue, 'finish').andCallThrough();
-				spyOn(observer, 'updateObservable').andCallThrough();
+				spyOn(simulator1, 'execute').and.callThrough();
+				spyOn(simulator1, 'finish').and.callThrough();
+				spyOn(simulator2, 'execute').and.callThrough();
+				spyOn(simulator2, 'finish').and.callThrough();
+				spyOn(simulator3, 'execute').and.callThrough();
+				spyOn(simulator3, 'finish').and.callThrough();
+				spyOn(simulatorQueue, 'finish').and.callThrough();
+				spyOn(observer, 'updateObservable').and.callThrough();
 				simulatorQueue.addObserver(observer);
 				expect(simulatorQueue.observers).toContain(observer);
 				expect(simulator1.execute).not.toHaveBeenCalled();
@@ -559,240 +535,180 @@ describe('jquery.simula', function () {
 			var simulator3;
 			
 			beforeEach(function () {
-				simulator1 = new TestTimeSimulator('simulator1', 50);
-				simulator2 = new TestTimeSimulator('simulator2', 50);
-				simulator3 = new TestTimeSimulator('simulator3', 50);
+				simulator1 = new $.simula.TimeSimulator(50);
+				simulator2 = new $.simula.TimeSimulator(50);
+				simulator3 = new $.simula.TimeSimulator(50);
 				simulatorQueue = new $.simula.SimulatorQueue([simulator1, simulator2, simulator3]);
 			});
 			
 			it('should clear the interval on stop', function () {
-				runs(function () {
-					this.observer = new $.simula.Observer();
-					spyOn(this.observer, 'updateObservable').andCallThrough();
-					simulatorQueue.addObserver(this.observer);
-					spyOn(simulator1, 'execute').andCallThrough();
-					spyOn(simulator1, 'finish').andCallThrough();
-					spyOn(simulator2, 'execute').andCallThrough();
-					spyOn(simulator3, 'execute').andCallThrough();
-					simulatorQueue.execute();
-					expect(simulatorQueue.isRunning()).toBeTruthy();
-					expect(simulator1.execute).toHaveBeenCalled();
-					expect(simulator1.finish).not.toHaveBeenCalled();
-					expect(this.observer.updateObservable).not.toHaveBeenCalled();
-					simulatorQueue.stop();
-					expect(simulatorQueue.isRunning()).toBeFalsy();
-					expect(this.observer.updateObservable).toHaveBeenCalledWith(simulatorQueue, 'stop');
-					this.observer.updateObservable.reset();
-				});
-				waits(500);
-				runs(function () {
-					expect(simulator1.finish).not.toHaveBeenCalled();
-					expect(simulator2.execute).not.toHaveBeenCalled();
-					expect(simulator3.execute).not.toHaveBeenCalled();
-					expect(this.observer.updateObservable).not.toHaveBeenCalled();
-				});
+				this.observer = new $.simula.Observer();
+				spyOn(this.observer, 'updateObservable').and.callThrough();
+				simulatorQueue.addObserver(this.observer);
+				spyOn(simulator1, 'execute').and.callThrough();
+				spyOn(simulator1, 'finish').and.callThrough();
+				spyOn(simulator2, 'execute').and.callThrough();
+				spyOn(simulator3, 'execute').and.callThrough();
+				simulatorQueue.execute();
+				expect(simulatorQueue.isRunning()).toBeTruthy();
+				expect(simulator1.execute).toHaveBeenCalled();
+				expect(simulator1.finish).not.toHaveBeenCalled();
+				expect(this.observer.updateObservable).not.toHaveBeenCalled();
+				simulatorQueue.stop();
+				expect(simulatorQueue.isRunning()).toBeFalsy();
+				expect(this.observer.updateObservable).toHaveBeenCalledWith(simulatorQueue, 'stop');
+				this.observer.updateObservable.calls.reset();
+				jasmine.clock().tick(151);
+				expect(simulator1.finish).not.toHaveBeenCalled();
+				expect(simulator2.execute).not.toHaveBeenCalled();
+				expect(simulator3.execute).not.toHaveBeenCalled();
+				expect(this.observer.updateObservable).not.toHaveBeenCalled();
 			});
 			
 			it('should execute one after another', function () {
-				runs(function () {
-					spyOn(simulator1, 'execute').andCallThrough();
-					spyOn(simulator1, 'finish').andCallThrough();
-					spyOn(simulator2, 'execute').andCallThrough();
-					spyOn(simulator2, 'finish').andCallThrough();
-					spyOn(simulator3, 'execute').andCallThrough();
-					spyOn(simulator3, 'finish').andCallThrough();
-					spyOn(simulatorQueue, 'finish').andCallThrough();
-					spyOn(observer, 'updateObservable').andCallThrough();
-					simulatorQueue.addObserver(observer);
-					expect(simulatorQueue.observers).toContain(observer);
-					expect(simulatorQueue.isRunning()).toBeFalsy();
-					simulatorQueue.execute();
-					expect(simulatorQueue.isRunning()).toBeTruthy();
-					expect(simulator1.execute).toHaveBeenCalled();
-					expect(simulator1.finish).not.toHaveBeenCalled();
-					expect(simulator2.execute).not.toHaveBeenCalled();
-					expect(simulator2.finish).not.toHaveBeenCalled();
-					expect(simulator3.execute).not.toHaveBeenCalled();
-					expect(simulator3.finish).not.toHaveBeenCalled();
-					expect(simulatorQueue.finish).not.toHaveBeenCalled();
-					expect(observer.updateObservable).not.toHaveBeenCalled();
-				});
-				waitsFor(function () {
-					return simulator1.finish.callCount == 1;
-				}, 'step 1 to finish', 100);
-				runs(function () {
-					expect((new Date()).getTime() - beforeExecution[simulator1.id].getTime()).toBeGreaterThan(40);
-					expect(simulatorQueue.isRunning()).toBeTruthy();
-					expect(simulator1.execute).toHaveBeenCalled();
-					expect(simulator1.finish).toHaveBeenCalled();
-					expect(simulator2.execute).toHaveBeenCalled();
-					expect(simulator2.finish).not.toHaveBeenCalled();
-					expect(simulator3.execute).not.toHaveBeenCalled();
-					expect(simulator3.finish).not.toHaveBeenCalled();
-					expect(simulatorQueue.finish).not.toHaveBeenCalled();
-					expect(observer.updateObservable).not.toHaveBeenCalled();
-				});
-				waitsFor(function () {
-					return simulator2.finish.callCount == 1;
-				}, 'step 2 to finish', 100);
-				runs(function () {
-					expect((new Date()).getTime() - beforeExecution[simulator2.id].getTime()).toBeGreaterThan(40);
-					expect(simulatorQueue.isRunning()).toBeTruthy();
-					expect(simulator1.execute).toHaveBeenCalled();
-					expect(simulator1.finish).toHaveBeenCalled();
-					expect(simulator2.execute).toHaveBeenCalled();
-					expect(simulator2.finish).toHaveBeenCalled();
-					expect(simulator3.execute).toHaveBeenCalled();
-					expect(simulator3.finish).not.toHaveBeenCalled();
-					expect(simulatorQueue.finish).not.toHaveBeenCalled();
-					expect(observer.updateObservable).not.toHaveBeenCalled();
-				});
-				waitsFor(function () {
-					return simulator3.finish.callCount == 1;
-				}, 'step 3 to finish', 100);
-				runs(function () {
-					expect((new Date()).getTime() - beforeExecution[simulator3.id].getTime()).toBeGreaterThan(40);
-					expect(simulatorQueue.isRunning()).toBeFalsy();
-					expect(simulator1.execute).toHaveBeenCalled();
-					expect(simulator1.finish).toHaveBeenCalled();
-					expect(simulator2.execute).toHaveBeenCalled();
-					expect(simulator2.finish).toHaveBeenCalled();
-					expect(simulator3.execute).toHaveBeenCalled();
-					expect(simulator3.finish).toHaveBeenCalled();
-					expect(simulatorQueue.finish).toHaveBeenCalled();
-					expect(observer.updateObservable).toHaveBeenCalledWith(simulatorQueue, 'finish');
-				});
+				spyOn(simulator1, 'execute').and.callThrough();
+				spyOn(simulator1, 'finish').and.callThrough();
+				spyOn(simulator2, 'execute').and.callThrough();
+				spyOn(simulator2, 'finish').and.callThrough();
+				spyOn(simulator3, 'execute').and.callThrough();
+				spyOn(simulator3, 'finish').and.callThrough();
+				spyOn(simulatorQueue, 'finish').and.callThrough();
+				spyOn(observer, 'updateObservable').and.callThrough();
+				simulatorQueue.addObserver(observer);
+				expect(simulatorQueue.observers).toContain(observer);
+				expect(simulatorQueue.isRunning()).toBeFalsy();
+				simulatorQueue.execute();
+				expect(simulatorQueue.isRunning()).toBeTruthy();
+				expect(simulator1.execute).toHaveBeenCalled();
+				expect(simulator1.finish).not.toHaveBeenCalled();
+				expect(simulator2.execute).not.toHaveBeenCalled();
+				expect(simulator2.finish).not.toHaveBeenCalled();
+				expect(simulator3.execute).not.toHaveBeenCalled();
+				expect(simulator3.finish).not.toHaveBeenCalled();
+				expect(simulatorQueue.finish).not.toHaveBeenCalled();
+				expect(observer.updateObservable).not.toHaveBeenCalled();
+				jasmine.clock().tick(51);
+				expect(simulator1.finish.calls.count()).toEqual(1);
+				expect(simulatorQueue.isRunning()).toBeTruthy();
+				expect(simulator1.execute).toHaveBeenCalled();
+				expect(simulator1.finish).toHaveBeenCalled();
+				expect(simulator2.execute).toHaveBeenCalled();
+				expect(simulator2.finish).not.toHaveBeenCalled();
+				expect(simulator3.execute).not.toHaveBeenCalled();
+				expect(simulator3.finish).not.toHaveBeenCalled();
+				expect(simulatorQueue.finish).not.toHaveBeenCalled();
+				expect(observer.updateObservable).not.toHaveBeenCalled();
+				jasmine.clock().tick(51);
+				expect(simulator2.finish.calls.count()).toEqual(1);
+				expect(simulatorQueue.isRunning()).toBeTruthy();
+				expect(simulator1.execute).toHaveBeenCalled();
+				expect(simulator1.finish).toHaveBeenCalled();
+				expect(simulator2.execute).toHaveBeenCalled();
+				expect(simulator2.finish).toHaveBeenCalled();
+				expect(simulator3.execute).toHaveBeenCalled();
+				expect(simulator3.finish).not.toHaveBeenCalled();
+				expect(simulatorQueue.finish).not.toHaveBeenCalled();
+				expect(observer.updateObservable).not.toHaveBeenCalled();
+				jasmine.clock().tick(51);
+				expect(simulator3.finish.calls.count()).toEqual(1);
+				expect(simulatorQueue.isRunning()).toBeFalsy();
+				expect(simulator1.execute).toHaveBeenCalled();
+				expect(simulator1.finish).toHaveBeenCalled();
+				expect(simulator2.execute).toHaveBeenCalled();
+				expect(simulator2.finish).toHaveBeenCalled();
+				expect(simulator3.execute).toHaveBeenCalled();
+				expect(simulator3.finish).toHaveBeenCalled();
+				expect(simulatorQueue.finish).toHaveBeenCalled();
+				expect(observer.updateObservable).toHaveBeenCalledWith(simulatorQueue, 'finish');
 			});
 			
 			it('should work to rerun the queue', function () {
-				runs(function () {
-					spyOn(simulatorQueue, 'finish').andCallThrough();
-					beforeExecution = new Date();
-					simulatorQueue.execute();
-				});
-				waitsFor(function () {
-					return simulatorQueue.finish.callCount == 1;
-				}, 'queue to finish', 300);
-				runs(function () {
-					expect(((new Date()).getTime() - beforeExecution[simulator1.id].getTime())
-						+ ((new Date()).getTime() - beforeExecution[simulator2.id].getTime())
-						+ ((new Date()).getTime() - beforeExecution[simulator3.id].getTime())).toBeGreaterThan(140);
-					expect(simulatorQueue.finish).toHaveBeenCalled();
-					simulatorQueue.finish.reset();
-					spyOn(simulator1, 'finish').andCallThrough();
-					spyOn(simulator2, 'finish').andCallThrough();
-					spyOn(simulator3, 'finish').andCallThrough();
-					expect(simulatorQueue.isRunning()).toBeFalsy();
-					simulatorQueue.execute();
-					expect(simulatorQueue.isRunning()).toBeTruthy();
-					expect(simulator1.finish).not.toHaveBeenCalled();
-					expect(simulator2.finish).not.toHaveBeenCalled();
-					expect(simulator3.finish).not.toHaveBeenCalled();
-					expect(simulatorQueue.finish).not.toHaveBeenCalled();
-				});
-				waitsFor(function () {
-					return simulator1.finish.callCount == 1;
-				}, 'step 1 to finish', 100);
-				runs(function () {
-					expect((new Date()).getTime() - beforeExecution[simulator1.id].getTime()).toBeGreaterThan(40);
-					expect(simulatorQueue.isRunning()).toBeTruthy();
-					expect(simulator1.finish).toHaveBeenCalled();
-					expect(simulator2.finish).not.toHaveBeenCalled();
-					expect(simulator3.finish).not.toHaveBeenCalled();
-					expect(simulatorQueue.finish).not.toHaveBeenCalled();
-				});
-				waitsFor(function () {
-					return simulator2.finish.callCount == 1;
-				}, 'step 2 to finish', 100);
-				runs(function () {
-					expect((new Date()).getTime() - beforeExecution[simulator2.id].getTime()).toBeGreaterThan(40);
-					expect(simulatorQueue.isRunning()).toBeTruthy();
-					expect(simulator1.finish).toHaveBeenCalled();
-					expect(simulator2.finish).toHaveBeenCalled();
-					expect(simulator3.finish).not.toHaveBeenCalled();
-					expect(simulatorQueue.finish).not.toHaveBeenCalled();
-				});
-				waitsFor(function () {
-					return simulator3.finish.callCount == 1;
-				}, 'step 3 to finish', 100);
-				runs(function () {
-					expect((new Date()).getTime() - beforeExecution[simulator3.id].getTime()).toBeGreaterThan(40);
-					expect(simulatorQueue.isRunning()).toBeFalsy();
-					expect(simulator1.finish).toHaveBeenCalled();
-					expect(simulator2.finish).toHaveBeenCalled();
-					expect(simulator3.finish).toHaveBeenCalled();
-					expect(simulatorQueue.finish).toHaveBeenCalled();
-				});
+				spyOn(simulatorQueue, 'finish').and.callThrough();
+				beforeExecution = new Date();
+				simulatorQueue.execute();
+				jasmine.clock().tick(151);
+				expect(simulatorQueue.finish.calls.count()).toEqual(1);
+				expect(simulatorQueue.finish).toHaveBeenCalled();
+				simulatorQueue.finish.calls.reset();
+				spyOn(simulator1, 'finish').and.callThrough();
+				spyOn(simulator2, 'finish').and.callThrough();
+				spyOn(simulator3, 'finish').and.callThrough();
+				expect(simulatorQueue.isRunning()).toBeFalsy();
+				simulatorQueue.execute();
+				expect(simulatorQueue.isRunning()).toBeTruthy();
+				expect(simulator1.finish).not.toHaveBeenCalled();
+				expect(simulator2.finish).not.toHaveBeenCalled();
+				expect(simulator3.finish).not.toHaveBeenCalled();
+				expect(simulatorQueue.finish).not.toHaveBeenCalled();
+				jasmine.clock().tick(51);
+				expect(simulator1.finish.calls.count()).toEqual(1);
+				expect(simulatorQueue.isRunning()).toBeTruthy();
+				expect(simulator1.finish).toHaveBeenCalled();
+				expect(simulator2.finish).not.toHaveBeenCalled();
+				expect(simulator3.finish).not.toHaveBeenCalled();
+				expect(simulatorQueue.finish).not.toHaveBeenCalled();
+				jasmine.clock().tick(51);
+				expect(simulator2.finish.calls.count()).toEqual(1);
+				expect(simulatorQueue.isRunning()).toBeTruthy();
+				expect(simulator1.finish).toHaveBeenCalled();
+				expect(simulator2.finish).toHaveBeenCalled();
+				expect(simulator3.finish).not.toHaveBeenCalled();
+				expect(simulatorQueue.finish).not.toHaveBeenCalled();
+				jasmine.clock().tick(51);
+				expect(simulator3.finish.calls.count()).toEqual(1);
+				expect(simulatorQueue.isRunning()).toBeFalsy();
+				expect(simulator1.finish).toHaveBeenCalled();
+				expect(simulator2.finish).toHaveBeenCalled();
+				expect(simulator3.finish).toHaveBeenCalled();
+				expect(simulatorQueue.finish).toHaveBeenCalled();
 			});
 			
 			it('should not care about unrelated updates', function () {
-				runs(function () {
-					spyOn(simulatorQueue, 'finish').andCallThrough();
-					spyOn(simulator1, 'finish').andCallThrough();
-					spyOn(simulator2, 'finish').andCallThrough();
-					spyOn(simulator3, 'finish').andCallThrough();
-					beforeExecution = new Date();
-					simulatorQueue.execute();
-					simulatorQueue.updateObservable(simulator1, 'somthing else');
-					expect(simulatorQueue.finish).not.toHaveBeenCalled();
-				});
-				waitsFor(function () {
-					return simulator1.finish.callCount == 1;
-				}, 'step 1 to finish', 100);
-				runs(function () {
-					simulatorQueue.updateObservable(null, 'finish');
-				});
-				waitsFor(function () {
-					return simulator2.finish.callCount == 1;
-				}, 'step 2 to finish', 100);
-				runs(function () {
-					simulatorQueue.updateObservable(simulator1, 'finish');
-					expect(simulatorQueue.finish).not.toHaveBeenCalled();
-				});
-				waitsFor(function () {
-					return simulator3.finish.callCount == 1;
-				}, 'step 3 to finish', 100);
-				runs(function () {
-					expect(simulatorQueue.finish).toHaveBeenCalled();
-				});
+				spyOn(simulatorQueue, 'finish').and.callThrough();
+				spyOn(simulator1, 'finish').and.callThrough();
+				spyOn(simulator2, 'finish').and.callThrough();
+				spyOn(simulator3, 'finish').and.callThrough();
+				beforeExecution = new Date();
+				simulatorQueue.execute();
+				simulatorQueue.updateObservable(simulator1, 'somthing else');
+				expect(simulatorQueue.finish).not.toHaveBeenCalled();
+				jasmine.clock().tick(51);
+				expect(simulator1.finish.calls.count()).toEqual(1);
+				simulatorQueue.updateObservable(null, 'finish');
+				jasmine.clock().tick(51);
+				expect(simulator2.finish.calls.count()).toEqual(1);
+				simulatorQueue.updateObservable(simulator1, 'finish');
+				expect(simulatorQueue.finish).not.toHaveBeenCalled();
+				jasmine.clock().tick(51);
+				expect(simulator3.finish.calls.count()).toEqual(1);
+				expect(simulatorQueue.finish).toHaveBeenCalled();
 			});
 			
 			it('should throw an error when trying to execute while running, but not interfere execution', function () {
-				runs(function () {
-					spyOn(simulatorQueue, 'finish').andCallThrough();
-					spyOn(simulator1, 'finish').andCallThrough();
-					spyOn(simulator2, 'finish').andCallThrough();
-					spyOn(simulator3, 'finish').andCallThrough();
+				spyOn(simulatorQueue, 'finish').and.callThrough();
+				spyOn(simulator1, 'finish').and.callThrough();
+				spyOn(simulator2, 'finish').and.callThrough();
+				spyOn(simulator3, 'finish').and.callThrough();
+				simulatorQueue.execute();
+				expect(function () {
 					simulatorQueue.execute();
-					expect(function () {
-						simulatorQueue.execute();
-					}).toThrow(new Error('Simulator is already running'));
-					expect(simulatorQueue.finish).not.toHaveBeenCalled();
-				});
-				waitsFor(function () {
-					return simulator1.finish.callCount == 1;
-				}, 'step 1 to finish', 100);
-				runs(function () {
-					expect(function () {
-						simulatorQueue.execute();
-					}).toThrow(new Error('Simulator is already running'));
-					expect(simulatorQueue.finish).not.toHaveBeenCalled();
-				});
-				waitsFor(function () {
-					return simulator2.finish.callCount == 1;
-				}, 'step 2 to finish', 100);
-				runs(function () {
-					expect(function () {
-						simulatorQueue.execute();
-					}).toThrow(new Error('Simulator is already running'));
-					expect(simulatorQueue.finish).not.toHaveBeenCalled();
-				});
-				waitsFor(function () {
-					return simulator3.finish.callCount == 1;
-				}, 'step 3 to finish', 100);
-				runs(function () {
-					expect(simulatorQueue.finish).toHaveBeenCalled();
-				});
+				}).toThrow(new Error('Simulator is already running'));
+				expect(simulatorQueue.finish).not.toHaveBeenCalled();
+				jasmine.clock().tick(51);
+				expect(simulator1.finish.calls.count()).toEqual(1);
+				expect(function () {
+					simulatorQueue.execute();
+				}).toThrow(new Error('Simulator is already running'));
+				expect(simulatorQueue.finish).not.toHaveBeenCalled();
+				jasmine.clock().tick(51);
+				expect(simulator2.finish.calls.count()).toEqual(1);
+				expect(function () {
+					simulatorQueue.execute();
+				}).toThrow(new Error('Simulator is already running'));
+				expect(simulatorQueue.finish).not.toHaveBeenCalled();
+				jasmine.clock().tick(51);
+				expect(simulator3.finish.calls.count()).toEqual(1);
+				expect(simulatorQueue.finish).toHaveBeenCalled();
 			});
 		
 		});
@@ -1026,225 +942,192 @@ describe('jquery.simula', function () {
 				type: $.simula.SimulaMouseEvent.TYPE.CLICK
 			});
 			mouseEventSimulator = new $.simula.MouseEventSimulator($('#one'), mouseEvent);
+			jasmine.clock().install();
 		});
 		
 		afterEach(function () {
 			$markup.remove();
 			mouseEventSimulator.stop();
+			jasmine.clock().uninstall();
 		});
 		
 		it('should update observers when finished', function () {
-			runs(function () {
-				mouseEventSimulator = new $.simula.MouseEventSimulator($('#one'), mouseEvent);
-				mouseSpy = jasmine.createSpy();
-				$('#one').click(mouseSpy);
-				spyOn(mouseEventSimulator, 'updateObservers').andCallThrough();
-				mouseEventSimulator.execute();
-			});
-			waitsFor(function () {
-				return mouseSpy.callCount == 1;
-			}, 'mouse spy to be called', 50);
-			runs(function () {
-				expect(mouseEventSimulator.updateObservers).toHaveBeenCalled();
-			});
+			mouseEventSimulator = new $.simula.MouseEventSimulator($('#one'), mouseEvent);
+			mouseSpy = jasmine.createSpy();
+			$('#one').click(mouseSpy);
+			spyOn(mouseEventSimulator, 'updateObservers').and.callThrough();
+			mouseEventSimulator.execute();
+			jasmine.clock().tick(51);
+			expect(mouseSpy.calls.count()).toEqual(1);
+			expect(mouseEventSimulator.updateObservers).toHaveBeenCalled();
 		});
 		
 		it('should dispatch "click"', function () {
-			runs(function () {
-				mouseEvent = new $.simula.SimulaMouseEvent({
-					type: $.simula.SimulaMouseEvent.TYPE.CLICK
-				});
-				mouseEventSimulator = new $.simula.MouseEventSimulator($('#one'), mouseEvent);
-				mouseSpy = jasmine.createSpy();
-				$('#one').click(mouseSpy);
-				mouseEventSimulator.execute();
+			mouseEvent = new $.simula.SimulaMouseEvent({
+				type: $.simula.SimulaMouseEvent.TYPE.CLICK
 			});
-			waitsFor(function () {
-				return mouseSpy.callCount == 1;
-			}, 'mouse spy to be called', 50);
-			runs(function () {
-				var event = mouseSpy.mostRecentCall.args[0].originalEvent;
-				expect(mouseEvent.type).toEqual(event.type);
-				expect(mouseEvent.bubbles).toEqual(event.bubbles);
-				expect(mouseEvent.cancelable).toEqual(event.cancelable);
-				expect(mouseEvent.view).toEqual(event.view);
-				expect(mouseEvent.detail).toEqual(event.detail);
-				expect(mouseEvent.screenX).toEqual(event.screenX);
-				expect(mouseEvent.screenY).toEqual(event.screenY);
-				expect(mouseEvent.clientX).toEqual(event.clientX);
-				expect(mouseEvent.clientY).toEqual(event.clientY);
-				expect(mouseEvent.ctrlKey).toEqual(event.ctrlKey);
-				expect(mouseEvent.shiftKey).toEqual(event.shiftKey);
-				expect(mouseEvent.altKey).toEqual(event.altKey);
-				expect(mouseEvent.metaKey).toEqual(event.metaKey);
-				expect(mouseEvent.button).toEqual(event.button);
-				expect(mouseEvent.relatedTarget).toEqual(event.relatedTarget);
-			});
+			mouseEventSimulator = new $.simula.MouseEventSimulator($('#one'), mouseEvent);
+			mouseSpy = jasmine.createSpy();
+			$('#one').click(mouseSpy);
+			mouseEventSimulator.execute();
+			jasmine.clock().tick(51);
+			expect(mouseSpy.calls.count()).toEqual(1);
+			var event = mouseSpy.calls.mostRecent().args[0].originalEvent;
+			expect(mouseEvent.type).toEqual(event.type);
+			expect(mouseEvent.bubbles).toEqual(event.bubbles);
+			expect(mouseEvent.cancelable).toEqual(event.cancelable);
+			expect(mouseEvent.view).toEqual(event.view);
+			expect(mouseEvent.detail).toEqual(event.detail);
+			expect(mouseEvent.screenX).toEqual(event.screenX);
+			expect(mouseEvent.screenY).toEqual(event.screenY);
+			expect(mouseEvent.clientX).toEqual(event.clientX);
+			expect(mouseEvent.clientY).toEqual(event.clientY);
+			expect(mouseEvent.ctrlKey).toEqual(event.ctrlKey);
+			expect(mouseEvent.shiftKey).toEqual(event.shiftKey);
+			expect(mouseEvent.altKey).toEqual(event.altKey);
+			expect(mouseEvent.metaKey).toEqual(event.metaKey);
+			expect(mouseEvent.button).toEqual(event.button);
+			expect(mouseEvent.relatedTarget).toEqual(event.relatedTarget);
 		});
 		
 		it('should dispatch "mousedown"', function () {
-			runs(function () {
-				mouseEvent = new $.simula.SimulaMouseEvent({
-					type: $.simula.SimulaMouseEvent.TYPE.DOWN
-				});
-				mouseEventSimulator = new $.simula.MouseEventSimulator($('#one'), mouseEvent);
-				mouseSpy = jasmine.createSpy();
-				$('#one').mousedown(mouseSpy);
-				mouseEventSimulator.execute();
+			mouseEvent = new $.simula.SimulaMouseEvent({
+				type: $.simula.SimulaMouseEvent.TYPE.DOWN
 			});
-			waitsFor(function () {
-				return mouseSpy.callCount == 1;
-			}, 'mouse spy to be called', 50);
-			runs(function () {
-				var event = mouseSpy.mostRecentCall.args[0].originalEvent;
-				expect(mouseEvent.type).toEqual(event.type);
-				expect(mouseEvent.bubbles).toEqual(event.bubbles);
-				expect(mouseEvent.cancelable).toEqual(event.cancelable);
-				expect(mouseEvent.view).toEqual(event.view);
-				expect(mouseEvent.detail).toEqual(event.detail);
-				expect(mouseEvent.screenX).toEqual(event.screenX);
-				expect(mouseEvent.screenY).toEqual(event.screenY);
-				expect(mouseEvent.clientX).toEqual(event.clientX);
-				expect(mouseEvent.clientY).toEqual(event.clientY);
-				expect(mouseEvent.ctrlKey).toEqual(event.ctrlKey);
-				expect(mouseEvent.shiftKey).toEqual(event.shiftKey);
-				expect(mouseEvent.altKey).toEqual(event.altKey);
-				expect(mouseEvent.metaKey).toEqual(event.metaKey);
-				expect(mouseEvent.button).toEqual(event.button);
-				expect(mouseEvent.relatedTarget).toEqual(event.relatedTarget);
-			});
+			mouseEventSimulator = new $.simula.MouseEventSimulator($('#one'), mouseEvent);
+			mouseSpy = jasmine.createSpy();
+			$('#one').mousedown(mouseSpy);
+			mouseEventSimulator.execute();
+			jasmine.clock().tick(51);
+			expect(mouseSpy.calls.count()).toEqual(1);
+			var event = mouseSpy.calls.mostRecent().args[0].originalEvent;
+			expect(mouseEvent.type).toEqual(event.type);
+			expect(mouseEvent.bubbles).toEqual(event.bubbles);
+			expect(mouseEvent.cancelable).toEqual(event.cancelable);
+			expect(mouseEvent.view).toEqual(event.view);
+			expect(mouseEvent.detail).toEqual(event.detail);
+			expect(mouseEvent.screenX).toEqual(event.screenX);
+			expect(mouseEvent.screenY).toEqual(event.screenY);
+			expect(mouseEvent.clientX).toEqual(event.clientX);
+			expect(mouseEvent.clientY).toEqual(event.clientY);
+			expect(mouseEvent.ctrlKey).toEqual(event.ctrlKey);
+			expect(mouseEvent.shiftKey).toEqual(event.shiftKey);
+			expect(mouseEvent.altKey).toEqual(event.altKey);
+			expect(mouseEvent.metaKey).toEqual(event.metaKey);
+			expect(mouseEvent.button).toEqual(event.button);
+			expect(mouseEvent.relatedTarget).toEqual(event.relatedTarget);
 		});
 		
 		it('should dispatch "mouseup"', function () {
-			runs(function () {
-				mouseEvent = new $.simula.SimulaMouseEvent({
-					type: $.simula.SimulaMouseEvent.TYPE.UP
-				});
-				mouseEventSimulator = new $.simula.MouseEventSimulator($('#one'), mouseEvent);
-				mouseSpy = jasmine.createSpy();
-				$('#one').mouseup(mouseSpy);
-				mouseEventSimulator.execute();
+			mouseEvent = new $.simula.SimulaMouseEvent({
+				type: $.simula.SimulaMouseEvent.TYPE.UP
 			});
-			waitsFor(function () {
-				return mouseSpy.callCount == 1;
-			}, 'mouse spy to be called', 50);
-			runs(function () {
-				var event = mouseSpy.mostRecentCall.args[0].originalEvent;
-				expect(mouseEvent.type).toEqual(event.type);
-				expect(mouseEvent.bubbles).toEqual(event.bubbles);
-				expect(mouseEvent.cancelable).toEqual(event.cancelable);
-				expect(mouseEvent.view).toEqual(event.view);
-				expect(mouseEvent.detail).toEqual(event.detail);
-				expect(mouseEvent.screenX).toEqual(event.screenX);
-				expect(mouseEvent.screenY).toEqual(event.screenY);
-				expect(mouseEvent.clientX).toEqual(event.clientX);
-				expect(mouseEvent.clientY).toEqual(event.clientY);
-				expect(mouseEvent.ctrlKey).toEqual(event.ctrlKey);
-				expect(mouseEvent.shiftKey).toEqual(event.shiftKey);
-				expect(mouseEvent.altKey).toEqual(event.altKey);
-				expect(mouseEvent.metaKey).toEqual(event.metaKey);
-				expect(mouseEvent.button).toEqual(event.button);
-				expect(mouseEvent.relatedTarget).toEqual(event.relatedTarget);
-			});
+			mouseEventSimulator = new $.simula.MouseEventSimulator($('#one'), mouseEvent);
+			mouseSpy = jasmine.createSpy();
+			$('#one').mouseup(mouseSpy);
+			mouseEventSimulator.execute();
+			jasmine.clock().tick(51);
+			expect(mouseSpy.calls.count()).toEqual(1);
+			var event = mouseSpy.calls.mostRecent().args[0].originalEvent;
+			expect(mouseEvent.type).toEqual(event.type);
+			expect(mouseEvent.bubbles).toEqual(event.bubbles);
+			expect(mouseEvent.cancelable).toEqual(event.cancelable);
+			expect(mouseEvent.view).toEqual(event.view);
+			expect(mouseEvent.detail).toEqual(event.detail);
+			expect(mouseEvent.screenX).toEqual(event.screenX);
+			expect(mouseEvent.screenY).toEqual(event.screenY);
+			expect(mouseEvent.clientX).toEqual(event.clientX);
+			expect(mouseEvent.clientY).toEqual(event.clientY);
+			expect(mouseEvent.ctrlKey).toEqual(event.ctrlKey);
+			expect(mouseEvent.shiftKey).toEqual(event.shiftKey);
+			expect(mouseEvent.altKey).toEqual(event.altKey);
+			expect(mouseEvent.metaKey).toEqual(event.metaKey);
+			expect(mouseEvent.button).toEqual(event.button);
+			expect(mouseEvent.relatedTarget).toEqual(event.relatedTarget);
 		});
 		
 		it('should dispatch "mouseover"', function () {
-			runs(function () {
-				mouseEvent = new $.simula.SimulaMouseEvent({
-					type: $.simula.SimulaMouseEvent.TYPE.OVER
-				});
-				mouseEventSimulator = new $.simula.MouseEventSimulator($('#one'), mouseEvent);
-				mouseSpy = jasmine.createSpy();
-				$('#one').mouseover(mouseSpy);
-				mouseEventSimulator.execute();
+			mouseEvent = new $.simula.SimulaMouseEvent({
+				type: $.simula.SimulaMouseEvent.TYPE.OVER
 			});
-			waitsFor(function () {
-				return mouseSpy.callCount == 1;
-			}, 'mouse spy to be called', 50);
-			runs(function () {
-				var event = mouseSpy.mostRecentCall.args[0].originalEvent;
-				expect(mouseEvent.type).toEqual(event.type);
-				expect(mouseEvent.bubbles).toEqual(event.bubbles);
-				expect(mouseEvent.cancelable).toEqual(event.cancelable);
-				expect(mouseEvent.view).toEqual(event.view);
-				expect(mouseEvent.detail).toEqual(event.detail);
-				expect(mouseEvent.screenX).toEqual(event.screenX);
-				expect(mouseEvent.screenY).toEqual(event.screenY);
-				expect(mouseEvent.clientX).toEqual(event.clientX);
-				expect(mouseEvent.clientY).toEqual(event.clientY);
-				expect(mouseEvent.ctrlKey).toEqual(event.ctrlKey);
-				expect(mouseEvent.shiftKey).toEqual(event.shiftKey);
-				expect(mouseEvent.altKey).toEqual(event.altKey);
-				expect(mouseEvent.metaKey).toEqual(event.metaKey);
-				expect(mouseEvent.button).toEqual(event.button);
-				expect(mouseEvent.relatedTarget).toEqual(event.relatedTarget);
-			});
+			mouseEventSimulator = new $.simula.MouseEventSimulator($('#one'), mouseEvent);
+			mouseSpy = jasmine.createSpy();
+			$('#one').mouseover(mouseSpy);
+			mouseEventSimulator.execute();
+			jasmine.clock().tick(51);
+			expect(mouseSpy.calls.count()).toEqual(1);
+			var event = mouseSpy.calls.mostRecent().args[0].originalEvent;
+			expect(mouseEvent.type).toEqual(event.type);
+			expect(mouseEvent.bubbles).toEqual(event.bubbles);
+			expect(mouseEvent.cancelable).toEqual(event.cancelable);
+			expect(mouseEvent.view).toEqual(event.view);
+			expect(mouseEvent.detail).toEqual(event.detail);
+			expect(mouseEvent.screenX).toEqual(event.screenX);
+			expect(mouseEvent.screenY).toEqual(event.screenY);
+			expect(mouseEvent.clientX).toEqual(event.clientX);
+			expect(mouseEvent.clientY).toEqual(event.clientY);
+			expect(mouseEvent.ctrlKey).toEqual(event.ctrlKey);
+			expect(mouseEvent.shiftKey).toEqual(event.shiftKey);
+			expect(mouseEvent.altKey).toEqual(event.altKey);
+			expect(mouseEvent.metaKey).toEqual(event.metaKey);
+			expect(mouseEvent.button).toEqual(event.button);
+			expect(mouseEvent.relatedTarget).toEqual(event.relatedTarget);
 		});
 		
 		it('should dispatch "mouseout"', function () {
-			runs(function () {
-				mouseEvent = new $.simula.SimulaMouseEvent({
-					type: $.simula.SimulaMouseEvent.TYPE.OUT
-				});
-				mouseEventSimulator = new $.simula.MouseEventSimulator($('#one'), mouseEvent);
-				mouseSpy = jasmine.createSpy();
-				$('#one').mouseout(mouseSpy);
-				mouseEventSimulator.execute();
+			mouseEvent = new $.simula.SimulaMouseEvent({
+				type: $.simula.SimulaMouseEvent.TYPE.OUT
 			});
-			waitsFor(function () {
-				return mouseSpy.callCount == 1;
-			}, 'mouse spy to be called', 50);
-			runs(function () {
-				var event = mouseSpy.mostRecentCall.args[0].originalEvent;
-				expect(mouseEvent.type).toEqual(event.type);
-				expect(mouseEvent.bubbles).toEqual(event.bubbles);
-				expect(mouseEvent.cancelable).toEqual(event.cancelable);
-				expect(mouseEvent.view).toEqual(event.view);
-				expect(mouseEvent.detail).toEqual(event.detail);
-				expect(mouseEvent.screenX).toEqual(event.screenX);
-				expect(mouseEvent.screenY).toEqual(event.screenY);
-				expect(mouseEvent.clientX).toEqual(event.clientX);
-				expect(mouseEvent.clientY).toEqual(event.clientY);
-				expect(mouseEvent.ctrlKey).toEqual(event.ctrlKey);
-				expect(mouseEvent.shiftKey).toEqual(event.shiftKey);
-				expect(mouseEvent.altKey).toEqual(event.altKey);
-				expect(mouseEvent.metaKey).toEqual(event.metaKey);
-				expect(mouseEvent.button).toEqual(event.button);
-				expect(mouseEvent.relatedTarget).toEqual(event.relatedTarget);
-			});
+			mouseEventSimulator = new $.simula.MouseEventSimulator($('#one'), mouseEvent);
+			mouseSpy = jasmine.createSpy();
+			$('#one').mouseout(mouseSpy);
+			mouseEventSimulator.execute();
+			jasmine.clock().tick(51);
+			expect(mouseSpy.calls.count()).toEqual(1);
+			var event = mouseSpy.calls.mostRecent().args[0].originalEvent;
+			expect(mouseEvent.type).toEqual(event.type);
+			expect(mouseEvent.bubbles).toEqual(event.bubbles);
+			expect(mouseEvent.cancelable).toEqual(event.cancelable);
+			expect(mouseEvent.view).toEqual(event.view);
+			expect(mouseEvent.detail).toEqual(event.detail);
+			expect(mouseEvent.screenX).toEqual(event.screenX);
+			expect(mouseEvent.screenY).toEqual(event.screenY);
+			expect(mouseEvent.clientX).toEqual(event.clientX);
+			expect(mouseEvent.clientY).toEqual(event.clientY);
+			expect(mouseEvent.ctrlKey).toEqual(event.ctrlKey);
+			expect(mouseEvent.shiftKey).toEqual(event.shiftKey);
+			expect(mouseEvent.altKey).toEqual(event.altKey);
+			expect(mouseEvent.metaKey).toEqual(event.metaKey);
+			expect(mouseEvent.button).toEqual(event.button);
+			expect(mouseEvent.relatedTarget).toEqual(event.relatedTarget);
 		});
 		
 		it('should dispatch "mousemove"', function () {
-			runs(function () {
-				mouseEvent = new $.simula.SimulaMouseEvent({
-					type: $.simula.SimulaMouseEvent.TYPE.MOVE
-				});
-				mouseEventSimulator = new $.simula.MouseEventSimulator($('#one'), mouseEvent);
-				mouseSpy = jasmine.createSpy();
-				$('#one').mousemove(mouseSpy);
-				mouseEventSimulator.execute();
+			mouseEvent = new $.simula.SimulaMouseEvent({
+				type: $.simula.SimulaMouseEvent.TYPE.MOVE
 			});
-			waitsFor(function () {
-				return mouseSpy.callCount == 1;
-			}, 'mouse spy to be called', 50);
-			runs(function () {
-				var event = mouseSpy.mostRecentCall.args[0].originalEvent;
-				expect(mouseEvent.type).toEqual(event.type);
-				expect(mouseEvent.bubbles).toEqual(event.bubbles);
-				expect(mouseEvent.cancelable).toEqual(event.cancelable);
-				expect(mouseEvent.view).toEqual(event.view);
-				expect(mouseEvent.detail).toEqual(event.detail);
-				expect(mouseEvent.screenX).toEqual(event.screenX);
-				expect(mouseEvent.screenY).toEqual(event.screenY);
-				expect(mouseEvent.clientX).toEqual(event.clientX);
-				expect(mouseEvent.clientY).toEqual(event.clientY);
-				expect(mouseEvent.ctrlKey).toEqual(event.ctrlKey);
-				expect(mouseEvent.shiftKey).toEqual(event.shiftKey);
-				expect(mouseEvent.altKey).toEqual(event.altKey);
-				expect(mouseEvent.metaKey).toEqual(event.metaKey);
-				expect(mouseEvent.button).toEqual(event.button);
-				expect(mouseEvent.relatedTarget).toEqual(event.relatedTarget);
-			});
+			mouseEventSimulator = new $.simula.MouseEventSimulator($('#one'), mouseEvent);
+			mouseSpy = jasmine.createSpy();
+			$('#one').mousemove(mouseSpy);
+			mouseEventSimulator.execute();
+			jasmine.clock().tick(51);
+			expect(mouseSpy.calls.count()).toEqual(1);
+			var event = mouseSpy.calls.mostRecent().args[0].originalEvent;
+			expect(mouseEvent.type).toEqual(event.type);
+			expect(mouseEvent.bubbles).toEqual(event.bubbles);
+			expect(mouseEvent.cancelable).toEqual(event.cancelable);
+			expect(mouseEvent.view).toEqual(event.view);
+			expect(mouseEvent.detail).toEqual(event.detail);
+			expect(mouseEvent.screenX).toEqual(event.screenX);
+			expect(mouseEvent.screenY).toEqual(event.screenY);
+			expect(mouseEvent.clientX).toEqual(event.clientX);
+			expect(mouseEvent.clientY).toEqual(event.clientY);
+			expect(mouseEvent.ctrlKey).toEqual(event.ctrlKey);
+			expect(mouseEvent.shiftKey).toEqual(event.shiftKey);
+			expect(mouseEvent.altKey).toEqual(event.altKey);
+			expect(mouseEvent.metaKey).toEqual(event.metaKey);
+			expect(mouseEvent.button).toEqual(event.button);
+			expect(mouseEvent.relatedTarget).toEqual(event.relatedTarget);
 		});
 		
 	});
@@ -1271,38 +1154,30 @@ describe('jquery.simula', function () {
 			$('body').prepend($markup);
 			startClientPosition = [$('#11').offset().left, $('#11').offset().top];
 			simulation = new $.simula.Simulation($('#11'), [0, 0]);
+			jasmine.clock().install();
 		});
 		
 		afterEach(function () {
 			$markup.remove();
 			simulation.stop();
+			jasmine.clock().uninstall();
 		});
 		
 		it('should not be intercepted by other Observables', function () {
-			runs(function () {
-				spyOn(simulation, 'finish').andCallThrough();
-				simulation.wait(50).wait(50).wait(50).execute();
-				expect(simulation.finish).not.toHaveBeenCalled();
-			});
-			waits(55);
-			runs(function () {
-				simulation.updateObservable(simulation.simulatorQueue.simulators[0], 'somthing else');
-				expect(simulation.finish).not.toHaveBeenCalled();
-			});
-			waits(10);
-			runs(function () {
-				simulation.updateObservable(null, 'finish');
-				expect(simulation.finish).not.toHaveBeenCalled();
-			});
-			waits(45);
-			runs(function () {
-				simulation.updateObservable(simulation.simulatorQueue.simulators[0], 'finish');
-				expect(simulation.finish).not.toHaveBeenCalled();
-			});
-			waits(55);
-			runs(function () {
-				expect(simulation.finish).toHaveBeenCalled();
-			});
+			spyOn(simulation, 'finish').and.callThrough();
+			simulation.wait(50).wait(50).wait(50).execute();
+			expect(simulation.finish).not.toHaveBeenCalled();
+			jasmine.clock().tick(51);
+			simulation.updateObservable(simulation.simulatorQueue.simulators[0], 'somthing else');
+			expect(simulation.finish).not.toHaveBeenCalled();
+			jasmine.clock().tick(10);
+			simulation.updateObservable(null, 'finish');
+			expect(simulation.finish).not.toHaveBeenCalled();
+			jasmine.clock().tick(41);
+			simulation.updateObservable(simulation.simulatorQueue.simulators[0], 'finish');
+			expect(simulation.finish).not.toHaveBeenCalled();
+			jasmine.clock().tick(51);
+			expect(simulation.finish).toHaveBeenCalled();
 		});
 		
 		describe('wait', function () {
@@ -1313,33 +1188,21 @@ describe('jquery.simula', function () {
 			});
 			
 			it('should wait for the specified duration', function () {
-				runs(function () {
-					spyOn(simulation, 'finish').andCallThrough();
-					simulation.wait(100).execute();
-				});
-				waits(80);
-				runs(function () {
-					expect(simulation.finish).not.toHaveBeenCalled();
-				});
-				waits(30);
-				runs(function () {
-					expect(simulation.finish).toHaveBeenCalled();
-				});
+				spyOn(simulation, 'finish').and.callThrough();
+				simulation.wait(100).execute();
+				jasmine.clock().tick(60);
+				expect(simulation.finish).not.toHaveBeenCalled();
+				jasmine.clock().tick(41);
+				expect(simulation.finish).toHaveBeenCalled();
 			});
 			
 			it('should wait for the default duration (50 ms)', function () {
-				runs(function () {
-					spyOn(simulation, 'finish').andCallThrough();
-					simulation.wait().execute();
-				});
-				waits(20);
-				runs(function () {
-					expect(simulation.finish).not.toHaveBeenCalled();
-				});
-				waits(40);
-				runs(function () {
-					expect(simulation.finish).toHaveBeenCalled();
-				});
+				spyOn(simulation, 'finish').and.callThrough();
+				simulation.wait().execute();
+				jasmine.clock().tick(10);
+				expect(simulation.finish).not.toHaveBeenCalled();
+				jasmine.clock().tick(41);
+				expect(simulation.finish).toHaveBeenCalled();
 			});
 			
 		});
@@ -1354,8 +1217,23 @@ describe('jquery.simula', function () {
 			var getLength = function (vector) {
 				return Math.sqrt(vector[0] * vector[0] + vector[1] * vector[1]);
 			};
+			var expectSpiesToHaveBeenCalledExclusively = function (suspects, spies) {
+				for (var i = 0; i < spies.length; i = i + 1) {
+					var spy = spies[i];
+					if (suspects.indexOf(spy) > -1) {
+						expect(spy).toHaveBeenCalled();
+					} else {
+						expect(spy).not.toHaveBeenCalled();
+					}
+				}
+			};
+			var resetSpies = function (spies) {
+				for (var i = 0; i < spies.length; i = i + 1) {
+					var spy = spies[i];
+					spy.calls.reset();
+				}
+			};
 			
-			var beforeExecution;
 			var moveSpy1;
 			var moveSpy11;
 			var moveSpy12;
@@ -1398,6 +1276,7 @@ describe('jquery.simula', function () {
 			var clickSpy121;
 			var clickSpy1111;
 			var clickSpy1112;
+			var spies;
 			
 			beforeEach(function () {
 				moveSpy1 = jasmine.createSpy();
@@ -1484,6 +1363,50 @@ describe('jquery.simula', function () {
 				$('#121').click(clickSpy121);
 				$('#1111').click(clickSpy1111);
 				$('#1112').click(clickSpy1112);
+				spies = [
+					moveSpy1,
+					moveSpy11,
+					moveSpy12,
+					moveSpy111,
+					moveSpy121,
+					moveSpy1111,
+					moveSpy1112,
+					enterSpy1,
+					enterSpy11,
+					enterSpy12,
+					enterSpy111,
+					enterSpy121,
+					enterSpy1111,
+					enterSpy1112,
+					leaveSpy1,
+					leaveSpy11,
+					leaveSpy12,
+					leaveSpy111,
+					leaveSpy121,
+					leaveSpy1111,
+					leaveSpy1112,
+					pressSpy1,
+					pressSpy11,
+					pressSpy12,
+					pressSpy111,
+					pressSpy121,
+					pressSpy1111,
+					pressSpy1112,
+					releaseSpy1,
+					releaseSpy11,
+					releaseSpy12,
+					releaseSpy111,
+					releaseSpy121,
+					releaseSpy1111,
+					releaseSpy1112,
+					clickSpy1,
+					clickSpy11,
+					clickSpy12,
+					clickSpy111,
+					clickSpy121,
+					clickSpy1111,
+					clickSpy1112,
+				];
 			});
 			
 			describe('move', function () {
@@ -1491,61 +1414,46 @@ describe('jquery.simula', function () {
 				describe('mousemove', function () {
 					
 					it('should work with no arguments', function () {
-						runs(function () {
-							simulation.mousemove().execute();
-						});
-						waitsFor(function () {
-							return !simulation.isRunning();
-						}, 'Simulation to finish', 1000);
-						runs(function () {
-							expect(moveSpy1).toHaveBeenCalled();
-							expect(moveSpy11).toHaveBeenCalled();
-							expect(moveSpy12).not.toHaveBeenCalled();
-							expect(moveSpy111).not.toHaveBeenCalled();
-							expect(moveSpy121).not.toHaveBeenCalled();
-							expect(moveSpy1111).not.toHaveBeenCalled();
-							expect(moveSpy1112).not.toHaveBeenCalled();
-						});
+						simulation.mousemove().execute();
+						jasmine.clock().tick(1000);
+						expect(simulation.isRunning()).toBeFalsy();
+						expect(moveSpy1).toHaveBeenCalled();
+						expect(moveSpy11).toHaveBeenCalled();
+						expect(moveSpy12).not.toHaveBeenCalled();
+						expect(moveSpy111).not.toHaveBeenCalled();
+						expect(moveSpy121).not.toHaveBeenCalled();
+						expect(moveSpy1111).not.toHaveBeenCalled();
+						expect(moveSpy1112).not.toHaveBeenCalled();
 					});
 					
 					it('should work with $element argument', function () {
-						runs(function () {
-							simulation.mousemove($('#121')).execute();
-						});
-						waitsFor(function () {
-							return !simulation.isRunning();
-						}, 'Simulation to finish', 1000);
-						runs(function () {
-							expect(moveSpy1).toHaveBeenCalled();
-							expect(moveSpy11).not.toHaveBeenCalled();
-							expect(moveSpy12).toHaveBeenCalled();
-							expect(moveSpy111).not.toHaveBeenCalled();
-							expect(moveSpy121).toHaveBeenCalled();
-							expect(moveSpy1111).not.toHaveBeenCalled();
-							expect(moveSpy1112).not.toHaveBeenCalled();
-						});
+						simulation.mousemove($('#121')).execute();
+						jasmine.clock().tick(1000);
+						expect(simulation.isRunning()).toBeFalsy();
+						expect(moveSpy1).toHaveBeenCalled();
+						expect(moveSpy11).not.toHaveBeenCalled();
+						expect(moveSpy12).toHaveBeenCalled();
+						expect(moveSpy111).not.toHaveBeenCalled();
+						expect(moveSpy121).toHaveBeenCalled();
+						expect(moveSpy1111).not.toHaveBeenCalled();
+						expect(moveSpy1112).not.toHaveBeenCalled();
 					});
 					
 					it('should work with full arguments', function () {
-						runs(function () {
-							simulation.mousemove($('#121'), {
-								button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
-							}).execute();
-						});
-						waitsFor(function () {
-							return !simulation.isRunning();
-						}, 'Simulation to finish', 1000);
-						runs(function () {
-							expect(moveSpy1).toHaveBeenCalled();
-							expect(moveSpy11).not.toHaveBeenCalled();
-							expect(moveSpy12).toHaveBeenCalled();
-							expect(moveSpy111).not.toHaveBeenCalled();
-							expect(moveSpy121).toHaveBeenCalled();
-							expect(moveSpy1111).not.toHaveBeenCalled();
-							expect(moveSpy1112).not.toHaveBeenCalled();
-							var event = moveSpy121.mostRecentCall.args[0];
-							expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
-						});
+						simulation.mousemove($('#121'), {
+							button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
+						}).execute();
+						jasmine.clock().tick(1000);
+						expect(simulation.isRunning()).toBeFalsy();
+						expect(moveSpy1).toHaveBeenCalled();
+						expect(moveSpy11).not.toHaveBeenCalled();
+						expect(moveSpy12).toHaveBeenCalled();
+						expect(moveSpy111).not.toHaveBeenCalled();
+						expect(moveSpy121).toHaveBeenCalled();
+						expect(moveSpy1111).not.toHaveBeenCalled();
+						expect(moveSpy1112).not.toHaveBeenCalled();
+						var event = moveSpy121.calls.mostRecent().args[0];
+						expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
 					});
 					
 				});
@@ -1557,610 +1465,222 @@ describe('jquery.simula', function () {
 				});
 				
 				it('should dispatch move only to the current element and its parents', function () {
-					runs(function () {
-						simulation.move([1, 1]).execute();
-					});
-					waitsFor(function () {
-						return !simulation.isRunning();
-					}, 'Simulation to finish', 1000);
-					runs(function () {
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).not.toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-					});
+					simulation.move([1, 1]).execute();
+					jasmine.clock().tick(1000);
+					expect(simulation.isRunning()).toBeFalsy();
+					expect(moveSpy1).toHaveBeenCalled();
+					expect(moveSpy11).toHaveBeenCalled();
+					expect(moveSpy12).not.toHaveBeenCalled();
+					expect(moveSpy111).not.toHaveBeenCalled();
+					expect(moveSpy121).not.toHaveBeenCalled();
+					expect(moveSpy1111).not.toHaveBeenCalled();
+					expect(moveSpy1112).not.toHaveBeenCalled();
 				});
 				
 				it('should dispatch a mousemove every 15 milliseconds and whould move 1 pixel per ms average', function () {
-					runs(function () {
-						this.currentClientPosition = [startClientPosition[0], startClientPosition[1]];
-						this.targetClientPosition = [startClientPosition[0] + 16, startClientPosition[1] + 63];
-						// sqrt(16 * 16 + 63 * 63) = 65 pixels ~ 4 + 1 mousemove
-						simulation.move([16, 63]).execute();
-						expect(moveSpy11).not.toHaveBeenCalled();
-					});
-					waitsFor(function () {
-						return moveSpy11.callCount == 1;
-					}, 'another mousemove', 100);
-					runs(function () {
-						var event = moveSpy11.mostRecentCall.args[0];
-						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
-						expect(Math.abs(15 - d)).toBeLessThan(1.5);
-						this.currentClientPosition = [event.clientX, event.clientY];
-						moveSpy11.reset();
-					});
-					waitsFor(function () {
-						return moveSpy11.callCount == 1;
-					}, 'another mousemove', 100);
-					runs(function () {
-						var event = moveSpy11.mostRecentCall.args[0];
-						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
-						expect(Math.abs(15 - d)).toBeLessThan(1.5);
-						this.currentClientPosition = [event.clientX, event.clientY];
-						moveSpy11.reset();
-					});
-					waitsFor(function () {
-						return moveSpy11.callCount == 1;
-					}, 'another mousemove', 100);
-					runs(function () {
-						var event = moveSpy11.mostRecentCall.args[0];
-						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
-						expect(Math.abs(15 - d)).toBeLessThan(1.5);
-						this.currentClientPosition = [event.clientX, event.clientY];
-						moveSpy11.reset();
-					});
-					waitsFor(function () {
-						return moveSpy11.callCount == 1;
-					}, 'another mousemove', 100);
-					runs(function () {
-						var event = moveSpy11.mostRecentCall.args[0];
-						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
-						expect(Math.abs(15 - d)).toBeLessThan(1.5);
-						this.currentClientPosition = [event.clientX, event.clientY];
-						moveSpy11.reset();
-					});
-					// last one
-					waitsFor(function () {
-						return moveSpy11.callCount == 1;
-					}, 'another mousemove', 100);
-					runs(function () {
-						var event = moveSpy11.mostRecentCall.args[0];
-						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
-						expect(d).toBeLessThan(15);
-						this.currentClientPosition = [event.clientX, event.clientY];
-						expect(getLength(getDifference(this.currentClientPosition, this.targetClientPosition))).toBeLessThan(1.5);
-						expect(simulation.isRunning()).toBeFalsy();
-					});
+					this.currentClientPosition = [startClientPosition[0], startClientPosition[1]];
+					this.targetClientPosition = [startClientPosition[0] + 16, startClientPosition[1] + 63];
+					// sqrt(16 * 16 + 63 * 63) = 65 pixels ~ 4 + 1 mousemove
+					simulation.move([16, 63]).execute();
+					jasmine.clock().tick(14);
+					expect(moveSpy11).not.toHaveBeenCalled();
+					jasmine.clock().tick(2);
+					expect(moveSpy11.calls.count()).toEqual(1);
+					var event = moveSpy11.calls.mostRecent().args[0];
+					var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+					expect(Math.abs(15 - d)).toBeLessThan(1.5);
+					this.currentClientPosition = [event.clientX, event.clientY];
+					moveSpy11.calls.reset();
+					jasmine.clock().tick(16);
+					expect(moveSpy11.calls.count()).toEqual(1);
+					var event = moveSpy11.calls.mostRecent().args[0];
+					var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+					expect(Math.abs(15 - d)).toBeLessThan(1.5);
+					this.currentClientPosition = [event.clientX, event.clientY];
+					moveSpy11.calls.reset();
+					jasmine.clock().tick(16);
+					expect(moveSpy11.calls.count()).toEqual(1);
+					var event = moveSpy11.calls.mostRecent().args[0];
+					var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+					expect(Math.abs(15 - d)).toBeLessThan(1.5);
+					this.currentClientPosition = [event.clientX, event.clientY];
+					moveSpy11.calls.reset();
+					jasmine.clock().tick(16);
+					expect(moveSpy11.calls.count()).toEqual(1);
+					var event = moveSpy11.calls.mostRecent().args[0];
+					var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+					expect(Math.abs(15 - d)).toBeLessThan(1.5);
+					this.currentClientPosition = [event.clientX, event.clientY];
+					moveSpy11.calls.reset();
+					jasmine.clock().tick(16);
+					expect(moveSpy11.calls.count()).toEqual(1);
+					var event = moveSpy11.calls.mostRecent().args[0];
+					var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+					expect(d).toBeLessThan(15);
+					this.currentClientPosition = [event.clientX, event.clientY];
+					expect(getLength(getDifference(this.currentClientPosition, this.targetClientPosition))).toBeLessThan(1.5);
+					expect(simulation.isRunning()).toBeFalsy();
 				});
 				
 				it('should work in auto mode', function () {
-					runs(function () {
-						this.currentClientPosition = [startClientPosition[0], startClientPosition[1]];
-						// sqrt((90 * 90) + (90 * 90)) = 127.279221 ~ 8 + 1 moves
-						this.targetClientPosition = [startClientPosition[0] + 90, startClientPosition[1] + 90];
-						simulation.move([90, 90], undefined, undefined, true).execute();
-					});
-					waits(1);
-					runs(function () {
-						expect(moveSpy1).not.toHaveBeenCalled();
-					});
-					waitsFor(function () {
-						return moveSpy1.callCount == 1;
-					}, 'another mousemove', 120);
+					this.currentClientPosition = [startClientPosition[0], startClientPosition[1]];
+					// sqrt((90 * 90) + (90 * 90)) = 127.279221 ~ 8 + 1 moves
+					this.targetClientPosition = [startClientPosition[0] + 90, startClientPosition[1] + 90];
+					simulation.move([90, 90], undefined, undefined, true).execute();
+					jasmine.clock().tick(1);
+					expect(moveSpy1).not.toHaveBeenCalled();
+					jasmine.clock().tick(15);
+					expect(moveSpy1.calls.count()).toEqual(1);
 					// step 1: move over 111
-					runs(function () {
-						var event = moveSpy1.mostRecentCall.args[0];
-						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
-						expect(Math.abs(15 - d)).toBeLessThan(1.5);
-						this.currentClientPosition = [event.clientX, event.clientY];
-					});
-					runs(function () {
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).toHaveBeenCalled();
-						expect(enterSpy11).toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).not.toHaveBeenCalled();
-						expect(leaveSpy11).not.toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).not.toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-					});
-					runs(function () {
-						moveSpy1.reset();
-						moveSpy11.reset();
-						moveSpy12.reset();
-						moveSpy111.reset();
-						moveSpy121.reset();
-						moveSpy1111.reset();
-						moveSpy1112.reset();
-						enterSpy1.reset();
-						enterSpy11.reset();
-						enterSpy12.reset();
-						enterSpy111.reset();
-						enterSpy121.reset();
-						enterSpy1111.reset();
-						enterSpy1112.reset();
-						leaveSpy1.reset();
-						leaveSpy11.reset();
-						leaveSpy12.reset();
-						leaveSpy111.reset();
-						leaveSpy121.reset();
-						leaveSpy1111.reset();
-						leaveSpy1112.reset();
-					});
-					waitsFor(function () {
-						return moveSpy1.callCount == 1;
-					}, 'another mousemove', 100);
-					// step 2: move over 1111
-					runs(function () {
-						var event = moveSpy1.mostRecentCall.args[0];
-						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
-						expect(Math.abs(15 - d)).toBeLessThan(1.5);
-						this.currentClientPosition = [event.clientX, event.clientY];
-					});
-					runs(function () {
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).toHaveBeenCalled();
-						expect(enterSpy11).toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).not.toHaveBeenCalled();
-						expect(leaveSpy11).not.toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).not.toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-					});
-					runs(function () {
-						moveSpy1.reset();
-						moveSpy11.reset();
-						moveSpy12.reset();
-						moveSpy111.reset();
-						moveSpy121.reset();
-						moveSpy1111.reset();
-						moveSpy1112.reset();
-						enterSpy1.reset();
-						enterSpy11.reset();
-						enterSpy12.reset();
-						enterSpy111.reset();
-						enterSpy121.reset();
-						enterSpy1111.reset();
-						enterSpy1112.reset();
-						leaveSpy1.reset();
-						leaveSpy11.reset();
-						leaveSpy12.reset();
-						leaveSpy111.reset();
-						leaveSpy121.reset();
-						leaveSpy1111.reset();
-						leaveSpy1112.reset();
-					});
-					waitsFor(function () {
-						return moveSpy1.callCount == 1;
-					}, 'another mousemove', 100);
-					// step 3: move on 1111
-					runs(function () {
-						var event = moveSpy1.mostRecentCall.args[0];
-						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
-						expect(Math.abs(15 - d)).toBeLessThan(1.5);
-						this.currentClientPosition = [event.clientX, event.clientY];
-					});
-					runs(function () {
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).not.toHaveBeenCalled();
-						expect(enterSpy11).not.toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).not.toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).not.toHaveBeenCalled();
-						expect(leaveSpy11).not.toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).not.toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-					});
-					runs(function () {
-						moveSpy1.reset();
-						moveSpy11.reset();
-						moveSpy12.reset();
-						moveSpy111.reset();
-						moveSpy121.reset();
-						moveSpy1111.reset();
-						moveSpy1112.reset();
-						enterSpy1.reset();
-						enterSpy11.reset();
-						enterSpy12.reset();
-						enterSpy111.reset();
-						enterSpy121.reset();
-						enterSpy1111.reset();
-						enterSpy1112.reset();
-						leaveSpy1.reset();
-						leaveSpy11.reset();
-						leaveSpy12.reset();
-						leaveSpy111.reset();
-						leaveSpy121.reset();
-						leaveSpy1111.reset();
-						leaveSpy1112.reset();
-					});
-					waitsFor(function () {
-						return moveSpy1.callCount == 1;
-					}, 'another mousemove', 100);
-					// step 4: leave 1111
-					runs(function () {
-						var event = moveSpy1.mostRecentCall.args[0];
-						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
-						expect(Math.abs(15 - d)).toBeLessThan(1.5);
-						this.currentClientPosition = [event.clientX, event.clientY];
-					});
-					runs(function () {
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).not.toHaveBeenCalled();
-						expect(enterSpy11).not.toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).not.toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).toHaveBeenCalled();
-						expect(leaveSpy11).toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-					});
-					runs(function () {
-						moveSpy1.reset();
-						moveSpy11.reset();
-						moveSpy12.reset();
-						moveSpy111.reset();
-						moveSpy121.reset();
-						moveSpy1111.reset();
-						moveSpy1112.reset();
-						enterSpy1.reset();
-						enterSpy11.reset();
-						enterSpy12.reset();
-						enterSpy111.reset();
-						enterSpy121.reset();
-						enterSpy1111.reset();
-						enterSpy1112.reset();
-						leaveSpy1.reset();
-						leaveSpy11.reset();
-						leaveSpy12.reset();
-						leaveSpy111.reset();
-						leaveSpy121.reset();
-						leaveSpy1111.reset();
-						leaveSpy1112.reset();
-					});
-					waitsFor(function () {
-						return moveSpy1.callCount == 1;
-					}, 'another mousemove', 100);
+					var event = moveSpy1.calls.mostRecent().args[0];
+					var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+					expect(Math.abs(15 - d)).toBeLessThan(1.5);
+					this.currentClientPosition = [event.clientX, event.clientY];
+					expectSpiesToHaveBeenCalledExclusively([
+						moveSpy1,
+						moveSpy11,
+						moveSpy111,
+						enterSpy1,
+						enterSpy11,
+						enterSpy111
+					], spies);
+					resetSpies(spies);
+					jasmine.clock().tick(15);
+					expect(moveSpy1.calls.count()).toEqual(1);
+					var event = moveSpy1.calls.mostRecent().args[0];
+					var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+					expect(Math.abs(15 - d)).toBeLessThan(1.5);
+					this.currentClientPosition = [event.clientX, event.clientY];
+					expectSpiesToHaveBeenCalledExclusively([
+						moveSpy1,
+						moveSpy11,
+						moveSpy111,
+						moveSpy1111,
+						enterSpy1,
+						enterSpy11,
+						enterSpy111,
+						enterSpy1111
+					], spies);
+					resetSpies(spies);
+					jasmine.clock().tick(15);
+					expect(moveSpy1.calls.count()).toEqual(1);
+					var event = moveSpy1.calls.mostRecent().args[0];
+					var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+					expect(Math.abs(15 - d)).toBeLessThan(1.5);
+					this.currentClientPosition = [event.clientX, event.clientY];
+					expectSpiesToHaveBeenCalledExclusively([
+						moveSpy1,
+						moveSpy11,
+						moveSpy111,
+						moveSpy1111
+					], spies);
+					resetSpies(spies);
+					jasmine.clock().tick(15);
+					expect(moveSpy1.calls.count()).toEqual(1);
+					var event = moveSpy1.calls.mostRecent().args[0];
+					var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+					expect(Math.abs(15 - d)).toBeLessThan(1.5);
+					this.currentClientPosition = [event.clientX, event.clientY];
+					expectSpiesToHaveBeenCalledExclusively([
+						moveSpy1,
+						moveSpy11,
+						moveSpy111,
+						leaveSpy1,
+						leaveSpy11,
+						leaveSpy111,
+						leaveSpy1111
+					], spies);
+					resetSpies(spies);
+					jasmine.clock().tick(15);
+					expect(moveSpy1.calls.count()).toEqual(1);
 					// step 5: move on 111
-					runs(function () {
-						var event = moveSpy1.mostRecentCall.args[0];
-						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
-						expect(Math.abs(15 - d)).toBeLessThan(1.5);
-						this.currentClientPosition = [event.clientX, event.clientY];
-					});
-					runs(function () {
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).not.toHaveBeenCalled();
-						expect(enterSpy11).not.toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).not.toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).not.toHaveBeenCalled();
-						expect(leaveSpy11).not.toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).not.toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-					});
-					runs(function () {
-						moveSpy1.reset();
-						moveSpy11.reset();
-						moveSpy12.reset();
-						moveSpy111.reset();
-						moveSpy121.reset();
-						moveSpy1111.reset();
-						moveSpy1112.reset();
-						enterSpy1.reset();
-						enterSpy11.reset();
-						enterSpy12.reset();
-						enterSpy111.reset();
-						enterSpy121.reset();
-						enterSpy1111.reset();
-						enterSpy1112.reset();
-						leaveSpy1.reset();
-						leaveSpy11.reset();
-						leaveSpy12.reset();
-						leaveSpy111.reset();
-						leaveSpy121.reset();
-						leaveSpy1111.reset();
-						leaveSpy1112.reset();
-					});
-					waitsFor(function () {
-						return moveSpy1.callCount == 1;
-					}, 'another mousemove', 100);
+					var event = moveSpy1.calls.mostRecent().args[0];
+					var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+					expect(Math.abs(15 - d)).toBeLessThan(1.5);
+					this.currentClientPosition = [event.clientX, event.clientY];
+					expectSpiesToHaveBeenCalledExclusively([
+						moveSpy1,
+						moveSpy11,
+						moveSpy111
+					], spies);
+					resetSpies(spies);
+					jasmine.clock().tick(15);
+					expect(moveSpy1.calls.count()).toEqual(1);
 					// step 6: move on 111
-					runs(function () {
-						var event = moveSpy1.mostRecentCall.args[0];
-						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
-						expect(Math.abs(15 - d)).toBeLessThan(1.5);
-						this.currentClientPosition = [event.clientX, event.clientY];
-					});
-					runs(function () {
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).not.toHaveBeenCalled();
-						expect(enterSpy11).not.toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).not.toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).not.toHaveBeenCalled();
-						expect(leaveSpy11).not.toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).not.toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-					});
-					runs(function () {
-						moveSpy1.reset();
-						moveSpy11.reset();
-						moveSpy12.reset();
-						moveSpy111.reset();
-						moveSpy121.reset();
-						moveSpy1111.reset();
-						moveSpy1112.reset();
-						enterSpy1.reset();
-						enterSpy11.reset();
-						enterSpy12.reset();
-						enterSpy111.reset();
-						enterSpy121.reset();
-						enterSpy1111.reset();
-						enterSpy1112.reset();
-						leaveSpy1.reset();
-						leaveSpy11.reset();
-						leaveSpy12.reset();
-						leaveSpy111.reset();
-						leaveSpy121.reset();
-						leaveSpy1111.reset();
-						leaveSpy1112.reset();
-					});
-					waitsFor(function () {
-						return moveSpy1.callCount == 1;
-					}, 'another mousemove', 100);
+					var event = moveSpy1.calls.mostRecent().args[0];
+					var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+					expect(Math.abs(15 - d)).toBeLessThan(1.5);
+					this.currentClientPosition = [event.clientX, event.clientY];
+					expectSpiesToHaveBeenCalledExclusively([
+						moveSpy1,
+						moveSpy11,
+						moveSpy111
+					], spies);
+					resetSpies(spies);
+					jasmine.clock().tick(15);
+					expect(moveSpy1.calls.count()).toEqual(1);
 					// step 7: leave 111
-					runs(function () {
-						var event = moveSpy1.mostRecentCall.args[0];
-						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
-						expect(Math.abs(15 - d)).toBeLessThan(1.5);
-						this.currentClientPosition = [event.clientX, event.clientY];
-					});
-					runs(function () {
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).not.toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).not.toHaveBeenCalled();
-						expect(enterSpy11).not.toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).not.toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).toHaveBeenCalled();
-						expect(leaveSpy11).toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-					});
-					runs(function () {
-						moveSpy1.reset();
-						moveSpy11.reset();
-						moveSpy12.reset();
-						moveSpy111.reset();
-						moveSpy121.reset();
-						moveSpy1111.reset();
-						moveSpy1112.reset();
-						enterSpy1.reset();
-						enterSpy11.reset();
-						enterSpy12.reset();
-						enterSpy111.reset();
-						enterSpy121.reset();
-						enterSpy1111.reset();
-						enterSpy1112.reset();
-						leaveSpy1.reset();
-						leaveSpy11.reset();
-						leaveSpy12.reset();
-						leaveSpy111.reset();
-						leaveSpy121.reset();
-						leaveSpy1111.reset();
-						leaveSpy1112.reset();
-					});
-					waitsFor(function () {
-						return moveSpy1.callCount == 1;
-					}, 'another mousemove', 100);
+					var event = moveSpy1.calls.mostRecent().args[0];
+					var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+					expect(Math.abs(15 - d)).toBeLessThan(1.5);
+					this.currentClientPosition = [event.clientX, event.clientY];
+					expectSpiesToHaveBeenCalledExclusively([
+						moveSpy1,
+						moveSpy11,
+						leaveSpy1,
+						leaveSpy11,
+						leaveSpy111
+					], spies);
+					resetSpies(spies);
+					jasmine.clock().tick(15);
+					expect(moveSpy1.calls.count()).toEqual(1);
 					// step 8: move on 11
-					runs(function () {
-						var event = moveSpy1.mostRecentCall.args[0];
-						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
-						expect(Math.abs(15 - d)).toBeLessThan(1.5);
-						this.currentClientPosition = [event.clientX, event.clientY];
-					});
-					runs(function () {
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).not.toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).not.toHaveBeenCalled();
-						expect(enterSpy11).not.toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).not.toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).not.toHaveBeenCalled();
-						expect(leaveSpy11).not.toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).not.toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-					});
-					runs(function () {
-						moveSpy1.reset();
-						moveSpy11.reset();
-						moveSpy12.reset();
-						moveSpy111.reset();
-						moveSpy121.reset();
-						moveSpy1111.reset();
-						moveSpy1112.reset();
-						enterSpy1.reset();
-						enterSpy11.reset();
-						enterSpy12.reset();
-						enterSpy111.reset();
-						enterSpy121.reset();
-						enterSpy1111.reset();
-						enterSpy1112.reset();
-						leaveSpy1.reset();
-						leaveSpy11.reset();
-						leaveSpy12.reset();
-						leaveSpy111.reset();
-						leaveSpy121.reset();
-						leaveSpy1111.reset();
-						leaveSpy1112.reset();
-					});
-					// last one
-					waitsFor(function () {
-						return moveSpy1.callCount == 1;
-					}, 'another mousemove', 100);
+					var event = moveSpy1.calls.mostRecent().args[0];
+					var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+					expect(Math.abs(15 - d)).toBeLessThan(1.5);
+					this.currentClientPosition = [event.clientX, event.clientY];
+					expectSpiesToHaveBeenCalledExclusively([
+						moveSpy1,
+						moveSpy11
+					], spies);
+					resetSpies(spies);
+					jasmine.clock().tick(15);
+					expect(moveSpy1.calls.count()).toEqual(1);
 					// step 9: leave 11
-					runs(function () {
-						var event = moveSpy1.mostRecentCall.args[0];
-						var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
-						expect(d).toBeLessThan(15);
-						this.currentClientPosition = [event.clientX, event.clientY];
-						expect(getLength(getDifference(this.currentClientPosition, this.targetClientPosition))).toBeLessThan(1.5);
-						expect(simulation.isRunning()).toBeFalsy();
-					});
-					runs(function () {
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).not.toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).not.toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).not.toHaveBeenCalled();
-						expect(enterSpy11).not.toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).not.toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).toHaveBeenCalled();
-						expect(leaveSpy11).toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).not.toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-					});
+					var event = moveSpy1.calls.mostRecent().args[0];
+					var d = getLength(getDifference(this.currentClientPosition, [event.clientX, event.clientY]));
+					expect(d).toBeLessThan(15);
+					this.currentClientPosition = [event.clientX, event.clientY];
+					expect(getLength(getDifference(this.currentClientPosition, this.targetClientPosition))).toBeLessThan(1.5);
+					expect(simulation.isRunning()).toBeFalsy();
+					expectSpiesToHaveBeenCalledExclusively([
+						moveSpy1,
+						leaveSpy1,
+						leaveSpy11
+					], spies);
+					resetSpies(spies);
 				});
 				
 				it('should set options', function () {
-					runs(function () {
-						simulation.move([1, 1], 1, {
-							button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
-						}).execute();
-					});
-					waitsFor(function () {
-						return !simulation.isRunning();
-					}, 'Simulation to finish', 1000);
-					runs(function () {
-						expect(moveSpy11).toHaveBeenCalled();
-						var event = moveSpy11.mostRecentCall.args[0];
-						expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
-					});
+					simulation.move([1, 1], 1, {
+						button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
+					}).execute();
+					jasmine.clock().tick(2);
+					expect(simulation.isRunning()).toBeFalsy();
+					expect(moveSpy11).toHaveBeenCalled();
+					var event = moveSpy11.calls.mostRecent().args[0];
+					expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
 				});
 				
 				it('should set duration', function () {
-					runs(function () {
-						beforeExecution = new Date();
-						simulation.move([1, 1], 20).execute();
-						expect(moveSpy11).not.toHaveBeenCalled();
-					});
-					waitsFor(function () {
-						return moveSpy11.callCount == 1;
-					}, 'mousemove to be called', 100);
-					runs(function () {
-						expect((new Date()).getTime() - beforeExecution.getTime()).toBeGreaterThan(5);
-					});
+					beforeExecution = new Date();
+					simulation.move([1, 1], 20).execute();
+					jasmine.clock().tick(9);
+					expect(moveSpy11).not.toHaveBeenCalled();
+					jasmine.clock().tick(10);
+					expect(moveSpy11.calls.count()).toEqual(1);
+					jasmine.clock().tick(10);
+					expect(moveSpy11.calls.count()).toEqual(2);
 				});
 				
 			});
@@ -2170,103 +1690,42 @@ describe('jquery.simula', function () {
 				describe('mouseover', function () {
 					
 					it('should work with no arguments', function () {
-						runs(function () {
-							simulation.mouseover().execute();
-						});
-						waitsFor(function () {
-							return !simulation.isRunning();
-						}, 'Simulation to finish', 1000);
-						runs(function () {
-							expect(moveSpy1).not.toHaveBeenCalled();
-							expect(moveSpy11).not.toHaveBeenCalled();
-							expect(moveSpy12).not.toHaveBeenCalled();
-							expect(moveSpy111).not.toHaveBeenCalled();
-							expect(moveSpy121).not.toHaveBeenCalled();
-							expect(moveSpy1111).not.toHaveBeenCalled();
-							expect(moveSpy1112).not.toHaveBeenCalled();
-							expect(enterSpy1).toHaveBeenCalled();
-							expect(enterSpy11).toHaveBeenCalled();
-							expect(enterSpy12).not.toHaveBeenCalled();
-							expect(enterSpy111).not.toHaveBeenCalled();
-							expect(enterSpy121).not.toHaveBeenCalled();
-							expect(enterSpy1111).not.toHaveBeenCalled();
-							expect(enterSpy1112).not.toHaveBeenCalled();
-							expect(leaveSpy1).not.toHaveBeenCalled();
-							expect(leaveSpy11).not.toHaveBeenCalled();
-							expect(leaveSpy12).not.toHaveBeenCalled();
-							expect(leaveSpy111).not.toHaveBeenCalled();
-							expect(leaveSpy121).not.toHaveBeenCalled();
-							expect(leaveSpy1111).not.toHaveBeenCalled();
-							expect(leaveSpy1112).not.toHaveBeenCalled();
-						});
+						simulation.mouseover().execute();
+						jasmine.clock().tick(1000);
+						expect(simulation.isRunning()).toBeFalsy();
+						expectSpiesToHaveBeenCalledExclusively([
+							enterSpy1,
+							enterSpy11
+						], spies);
+						resetSpies(spies);
 					});
 					
 					it('should work with $element argument', function () {
-						runs(function () {
-							simulation.mouseover($('#121')).execute();
-						});
-						waitsFor(function () {
-							return !simulation.isRunning();
-						}, 'Simulation to finish', 1000);
-						runs(function () {
-							expect(moveSpy1).not.toHaveBeenCalled();
-							expect(moveSpy11).not.toHaveBeenCalled();
-							expect(moveSpy12).not.toHaveBeenCalled();
-							expect(moveSpy111).not.toHaveBeenCalled();
-							expect(moveSpy121).not.toHaveBeenCalled();
-							expect(moveSpy1111).not.toHaveBeenCalled();
-							expect(moveSpy1112).not.toHaveBeenCalled();
-							expect(enterSpy1).toHaveBeenCalled();
-							expect(enterSpy11).not.toHaveBeenCalled();
-							expect(enterSpy12).toHaveBeenCalled();
-							expect(enterSpy111).not.toHaveBeenCalled();
-							expect(enterSpy121).toHaveBeenCalled();
-							expect(enterSpy1111).not.toHaveBeenCalled();
-							expect(enterSpy1112).not.toHaveBeenCalled();
-							expect(leaveSpy1).not.toHaveBeenCalled();
-							expect(leaveSpy11).not.toHaveBeenCalled();
-							expect(leaveSpy12).not.toHaveBeenCalled();
-							expect(leaveSpy111).not.toHaveBeenCalled();
-							expect(leaveSpy121).not.toHaveBeenCalled();
-							expect(leaveSpy1111).not.toHaveBeenCalled();
-							expect(leaveSpy1112).not.toHaveBeenCalled();
-						});
+						simulation.mouseover($('#121')).execute();
+						jasmine.clock().tick(1000);
+						expect(simulation.isRunning()).toBeFalsy();
+						expectSpiesToHaveBeenCalledExclusively([
+							enterSpy1,
+							enterSpy12,
+							enterSpy121
+						], spies);
+						resetSpies(spies);
 					});
 					
 					it('should work with full arguments', function () {
-						runs(function () {
-							simulation.mouseover($('#121'), {
-								button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
-							}).execute();
-						});
-						waitsFor(function () {
-							return !simulation.isRunning();
-						}, 'Simulation to finish', 1000);
-						runs(function () {
-							expect(moveSpy1).not.toHaveBeenCalled();
-							expect(moveSpy11).not.toHaveBeenCalled();
-							expect(moveSpy12).not.toHaveBeenCalled();
-							expect(moveSpy111).not.toHaveBeenCalled();
-							expect(moveSpy121).not.toHaveBeenCalled();
-							expect(moveSpy1111).not.toHaveBeenCalled();
-							expect(moveSpy1112).not.toHaveBeenCalled();
-							expect(enterSpy1).toHaveBeenCalled();
-							expect(enterSpy11).not.toHaveBeenCalled();
-							expect(enterSpy12).toHaveBeenCalled();
-							expect(enterSpy111).not.toHaveBeenCalled();
-							expect(enterSpy121).toHaveBeenCalled();
-							expect(enterSpy1111).not.toHaveBeenCalled();
-							expect(enterSpy1112).not.toHaveBeenCalled();
-							expect(leaveSpy1).not.toHaveBeenCalled();
-							expect(leaveSpy11).not.toHaveBeenCalled();
-							expect(leaveSpy12).not.toHaveBeenCalled();
-							expect(leaveSpy111).not.toHaveBeenCalled();
-							expect(leaveSpy121).not.toHaveBeenCalled();
-							expect(leaveSpy1111).not.toHaveBeenCalled();
-							expect(leaveSpy1112).not.toHaveBeenCalled();
-							var event = enterSpy121.mostRecentCall.args[0];
-							expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
-						});
+						simulation.mouseover($('#121'), {
+							button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
+						}).execute();
+						jasmine.clock().tick(1000);
+						expect(simulation.isRunning()).toBeFalsy();
+						expectSpiesToHaveBeenCalledExclusively([
+							enterSpy1,
+							enterSpy12,
+							enterSpy121
+						], spies);
+						var event = enterSpy121.calls.mostRecent().args[0];
+						expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
+						resetSpies(spies);
 					});
 					
 				});
@@ -2279,193 +1738,99 @@ describe('jquery.simula', function () {
 				});
 				
 				it('should be in the middle of the entered element and have the correct relatedTarget', function () {
-					runs(function () {
-						simulation.enter($('#111')).execute();
-					});
-					waitsFor(function () {
-						return enterSpy11.callCount == 1;
-					}, 'enterSpy11 to be called', 1000);
-					runs(function () {
-						var event = enterSpy11.mostRecentCall.args[0];
-						expect(Math.abs(event.clientX - (simulation.$element.offset().left + simulation.elementPosition[0]))).toBeLessThan(1.5);
-						expect(Math.abs(event.clientY - (simulation.$element.offset().top + simulation.elementPosition[1]))).toBeLessThan(1.5);
-						expect(event.relatedTarget).toBe($('#11').get(0));
-					});
+					simulation.enter($('#111')).execute();
+					jasmine.clock().tick(1000);
+					expect(enterSpy11.calls.count()).toEqual(1);
+					var event = enterSpy11.calls.mostRecent().args[0];
+					expect(Math.abs(event.clientX - (simulation.$element.offset().left + simulation.elementPosition[0]))).toBeLessThan(1.5);
+					expect(Math.abs(event.clientY - (simulation.$element.offset().top + simulation.elementPosition[1]))).toBeLessThan(1.5);
+					expect(event.relatedTarget).toBe($('#11').get(0));
 				});
 				
 				it('should set options', function () {
-					runs(function () {
-						simulation.enter($('#111'), {
-							button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
-						}).execute();
-					});
-					waitsFor(function () {
-						return enterSpy11.callCount == 1;
-					}, 'enterSpy11 to be called', 1000);
-					runs(function () {
-						var event = enterSpy11.mostRecentCall.args[0];
-						expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
-					});
+					simulation.enter($('#111'), {
+						button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
+					}).execute();
+					jasmine.clock().tick(1000);
+					expect(enterSpy11.calls.count()).toEqual(1);
+					var event = enterSpy11.calls.mostRecent().args[0];
+					expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
 				});
 				
 				it('should enter direct child', function () {
-					runs(function () {
-						simulation.enter($('#111')).execute();
-					});
-					waitsFor(function () {
-						return !simulation.isRunning();
-					}, 'Simulation to finish', 1000);
-					runs(function () {
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).not.toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).toHaveBeenCalled();
-						expect(enterSpy11).toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).not.toHaveBeenCalled();
-						expect(leaveSpy11).not.toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).not.toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-					});
+					simulation.enter($('#111')).execute();
+					jasmine.clock().tick(1000);
+					expect(simulation.isRunning()).toBeFalsy();
+					expectSpiesToHaveBeenCalledExclusively([
+						moveSpy1,
+						moveSpy11,
+						enterSpy1,
+						enterSpy11,
+						enterSpy111
+					], spies);
+					resetSpies(spies);
 				});
 				
 				it('should enter itself', function () {
-					runs(function () {
-						simulation.enter($('#11')).execute();
-					});
-					waitsFor(function () {
-						return !simulation.isRunning();
-					}, 'Simulation to finish', 1000);
-					runs(function () {
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).not.toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).toHaveBeenCalled();
-						expect(enterSpy11).toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).not.toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).toHaveBeenCalled();
-						expect(leaveSpy11).toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).not.toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-					});
+					simulation.enter($('#11')).execute();
+					jasmine.clock().tick(1000);
+					expect(simulation.isRunning()).toBeFalsy();
+					expectSpiesToHaveBeenCalledExclusively([
+						moveSpy1,
+						moveSpy11,
+						enterSpy1,
+						enterSpy11,
+						leaveSpy1,
+						leaveSpy11
+					], spies);
+					resetSpies(spies);
 				});
 				
 				it('should enter distant child', function () {
-					runs(function () {
-						simulation.enter($('#1112')).execute();
-					});
-					waitsFor(function () {
-						return !simulation.isRunning();
-					}, 'Simulation to finish', 1000);
-					runs(function () {
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).toHaveBeenCalled();
-						expect(enterSpy11).toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).toHaveBeenCalled();
-						expect(leaveSpy1).not.toHaveBeenCalled();
-						expect(leaveSpy11).not.toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).not.toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-					});
+					simulation.enter($('#1112')).execute();
+					jasmine.clock().tick(1000);
+					expect(simulation.isRunning()).toBeFalsy();
+					expectSpiesToHaveBeenCalledExclusively([
+						moveSpy1,
+						moveSpy11,
+						moveSpy111,
+						enterSpy1,
+						enterSpy11,
+						enterSpy111,
+						enterSpy1112
+					], spies);
+					resetSpies(spies);
 				});
 				
 				it('should enter parent', function () {
-					runs(function () {
-						simulation.enter($('#1')).execute();
-					});
-					waitsFor(function () {
-						return !simulation.isRunning();
-					}, 'Simulation to finish', 3000);
-					runs(function () {
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).not.toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).toHaveBeenCalled();
-						expect(enterSpy11).not.toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).not.toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).toHaveBeenCalled();
-						expect(leaveSpy11).toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).not.toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-					});
+					simulation.enter($('#1')).execute();
+					jasmine.clock().tick(3000);
+					expect(simulation.isRunning()).toBeFalsy();
+					expectSpiesToHaveBeenCalledExclusively([
+						moveSpy1,
+						moveSpy11,
+						enterSpy1,
+						leaveSpy1,
+						leaveSpy11
+					], spies);
+					resetSpies(spies);
 				});
 				
 				it('should enter on element on different stack', function () {
-					runs(function () {
-						simulation.enter($('#121')).execute();
-					});
-					waitsFor(function () {
-						return !simulation.isRunning();
-					}, 'Simulation to finish', 1000);
-					runs(function () {
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).toHaveBeenCalled();
-						expect(moveSpy12).toHaveBeenCalled();
-						expect(moveSpy111).not.toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).toHaveBeenCalled();
-						expect(enterSpy11).not.toHaveBeenCalled();
-						expect(enterSpy12).toHaveBeenCalled();
-						expect(enterSpy111).not.toHaveBeenCalled();
-						expect(enterSpy121).toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).toHaveBeenCalled();
-						expect(leaveSpy11).toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).not.toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-					});
+					simulation.enter($('#121')).execute();
+					jasmine.clock().tick(1000);
+					expect(simulation.isRunning()).toBeFalsy();
+					expectSpiesToHaveBeenCalledExclusively([
+						moveSpy1,
+						moveSpy11,
+						moveSpy12,
+						enterSpy1,
+						enterSpy12,
+						enterSpy121,
+						leaveSpy1,
+						leaveSpy11
+					], spies);
+					resetSpies(spies);
 				});
 				
 			});
@@ -2475,103 +1840,42 @@ describe('jquery.simula', function () {
 				describe('mouseout', function () {
 					
 					it('should work with no arguments', function () {
-						runs(function () {
-							simulation.mouseout().execute();
-						});
-						waitsFor(function () {
-							return !simulation.isRunning();
-						}, 'Simulation to finish', 1000);
-						runs(function () {
-							expect(moveSpy1).not.toHaveBeenCalled();
-							expect(moveSpy11).not.toHaveBeenCalled();
-							expect(moveSpy12).not.toHaveBeenCalled();
-							expect(moveSpy111).not.toHaveBeenCalled();
-							expect(moveSpy121).not.toHaveBeenCalled();
-							expect(moveSpy1111).not.toHaveBeenCalled();
-							expect(moveSpy1112).not.toHaveBeenCalled();
-							expect(enterSpy1).not.toHaveBeenCalled();
-							expect(enterSpy11).not.toHaveBeenCalled();
-							expect(enterSpy12).not.toHaveBeenCalled();
-							expect(enterSpy111).not.toHaveBeenCalled();
-							expect(enterSpy121).not.toHaveBeenCalled();
-							expect(enterSpy1111).not.toHaveBeenCalled();
-							expect(enterSpy1112).not.toHaveBeenCalled();
-							expect(leaveSpy1).toHaveBeenCalled();
-							expect(leaveSpy11).toHaveBeenCalled();
-							expect(leaveSpy12).not.toHaveBeenCalled();
-							expect(leaveSpy111).not.toHaveBeenCalled();
-							expect(leaveSpy121).not.toHaveBeenCalled();
-							expect(leaveSpy1111).not.toHaveBeenCalled();
-							expect(leaveSpy1112).not.toHaveBeenCalled();
-						});
+						simulation.mouseout().execute();
+						jasmine.clock().tick(1000);
+						expect(simulation.isRunning()).toBeFalsy();
+						expectSpiesToHaveBeenCalledExclusively([
+							leaveSpy1,
+							leaveSpy11
+						], spies);
+						resetSpies(spies);
 					});
 					
 					it('should work with $element argument', function () {
-						runs(function () {
-							simulation.mouseout($('#121')).execute();
-						});
-						waitsFor(function () {
-							return !simulation.isRunning();
-						}, 'Simulation to finish', 1000);
-						runs(function () {
-							expect(moveSpy1).not.toHaveBeenCalled();
-							expect(moveSpy11).not.toHaveBeenCalled();
-							expect(moveSpy12).not.toHaveBeenCalled();
-							expect(moveSpy111).not.toHaveBeenCalled();
-							expect(moveSpy121).not.toHaveBeenCalled();
-							expect(moveSpy1111).not.toHaveBeenCalled();
-							expect(moveSpy1112).not.toHaveBeenCalled();
-							expect(enterSpy1).not.toHaveBeenCalled();
-							expect(enterSpy11).not.toHaveBeenCalled();
-							expect(enterSpy12).not.toHaveBeenCalled();
-							expect(enterSpy111).not.toHaveBeenCalled();
-							expect(enterSpy121).not.toHaveBeenCalled();
-							expect(enterSpy1111).not.toHaveBeenCalled();
-							expect(enterSpy1112).not.toHaveBeenCalled();
-							expect(leaveSpy1).toHaveBeenCalled();
-							expect(leaveSpy11).not.toHaveBeenCalled();
-							expect(leaveSpy12).toHaveBeenCalled();
-							expect(leaveSpy111).not.toHaveBeenCalled();
-							expect(leaveSpy121).toHaveBeenCalled();
-							expect(leaveSpy1111).not.toHaveBeenCalled();
-							expect(leaveSpy1112).not.toHaveBeenCalled();
-						});
+						simulation.mouseout($('#121')).execute();
+						jasmine.clock().tick(1000);
+						expect(simulation.isRunning()).toBeFalsy();
+						expectSpiesToHaveBeenCalledExclusively([
+							leaveSpy1,
+							leaveSpy12,
+							leaveSpy121
+						], spies);
+						resetSpies(spies);
 					});
 					
 					it('should work with full arguments', function () {
-						runs(function () {
-							simulation.mouseout($('#121'), {
-								button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
-							}).execute();
-						});
-						waitsFor(function () {
-							return !simulation.isRunning();
-						}, 'Simulation to finish', 1000);
-						runs(function () {
-							expect(moveSpy1).not.toHaveBeenCalled();
-							expect(moveSpy11).not.toHaveBeenCalled();
-							expect(moveSpy12).not.toHaveBeenCalled();
-							expect(moveSpy111).not.toHaveBeenCalled();
-							expect(moveSpy121).not.toHaveBeenCalled();
-							expect(moveSpy1111).not.toHaveBeenCalled();
-							expect(moveSpy1112).not.toHaveBeenCalled();
-							expect(enterSpy1).not.toHaveBeenCalled();
-							expect(enterSpy11).not.toHaveBeenCalled();
-							expect(enterSpy12).not.toHaveBeenCalled();
-							expect(enterSpy111).not.toHaveBeenCalled();
-							expect(enterSpy121).not.toHaveBeenCalled();
-							expect(enterSpy1111).not.toHaveBeenCalled();
-							expect(enterSpy1112).not.toHaveBeenCalled();
-							expect(leaveSpy1).toHaveBeenCalled();
-							expect(leaveSpy11).not.toHaveBeenCalled();
-							expect(leaveSpy12).toHaveBeenCalled();
-							expect(leaveSpy111).not.toHaveBeenCalled();
-							expect(leaveSpy121).toHaveBeenCalled();
-							expect(leaveSpy1111).not.toHaveBeenCalled();
-							expect(leaveSpy1112).not.toHaveBeenCalled();
-							var event = leaveSpy121.mostRecentCall.args[0];
-							expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
-						});
+						simulation.mouseout($('#121'), {
+							button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
+						}).execute();
+						jasmine.clock().tick(1000);
+						expect(simulation.isRunning()).toBeFalsy();
+						expectSpiesToHaveBeenCalledExclusively([
+							leaveSpy1,
+							leaveSpy12,
+							leaveSpy121
+						], spies);
+						var event = leaveSpy121.calls.mostRecent().args[0];
+						expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
+						resetSpies(spies);
 					});
 					
 				});
@@ -2584,138 +1888,83 @@ describe('jquery.simula', function () {
 				});
 				
 				it('should be in the middle of the left element\'s parent and have the correct relatedTarget', function () {
-					runs(function () {
-						simulation.leave($('#11')).execute();
-					});
-					waitsFor(function () {
-						return leaveSpy11.callCount == 1;
-					}, 'leaveSpy11 to be called', 1000);
-					runs(function () {
-						var event = leaveSpy11.mostRecentCall.args[0];
-						expect(Math.abs(event.clientX - (simulation.$element.offset().left + simulation.elementPosition[0]))).toBeLessThan(1.5);
-						expect(Math.abs(event.clientY - (simulation.$element.offset().top + simulation.elementPosition[1]))).toBeLessThan(1.5);
-						expect(event.relatedTarget).toBe($('#1').get(0));
-					});
+					simulation.leave($('#11')).execute();
+					jasmine.clock().tick(1000);
+					expect(leaveSpy11.calls.count()).toEqual(1);
+					var event = leaveSpy11.calls.mostRecent().args[0];
+					expect(Math.abs(event.clientX - (simulation.$element.offset().left + simulation.elementPosition[0]))).toBeLessThan(1.5);
+					expect(Math.abs(event.clientY - (simulation.$element.offset().top + simulation.elementPosition[1]))).toBeLessThan(1.5);
+					expect(event.relatedTarget).toBe($('#1').get(0));
 				});
 				
 				it('should leave without argument', function () {
-					runs(function () {
-						simulation.leave().execute();
-					});
-					waitsFor(function () {
-						return leaveSpy11.callCount == 1;
-					}, 'leaveSpy11 to be called', 1000);
+					simulation.leave().execute();
+					jasmine.clock().tick(1000);
+					expect(leaveSpy11.calls.count()).toEqual(1);
 				});
 				
 				it('should set options', function () {
-					runs(function () {
-						simulation.leave($('#11'), {
-							button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
-						}).execute();
-					});
-					waitsFor(function () {
-						return leaveSpy11.callCount == 1;
-					}, 'leaveSpy11 to be called', 1000);
-					runs(function () {
-						var event = leaveSpy11.mostRecentCall.args[0];
-						expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
-					});
+					simulation.leave($('#11'), {
+						button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
+					}).execute();
+					jasmine.clock().tick(1000);
+					expect(leaveSpy11.calls.count()).toEqual(1);
+					var event = leaveSpy11.calls.mostRecent().args[0];
+					expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
 				});
 				
 				it('should leave distant child', function () {
-					runs(function () {
-						simulation.leave($('#1112')).execute();
-					});
-					waitsFor(function () {
-						return !simulation.isRunning();
-					}, 'Simulation to finish', 1000);
-					runs(function () {
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).toHaveBeenCalled();
-						expect(enterSpy1).toHaveBeenCalled();
-						expect(enterSpy11).toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).toHaveBeenCalled();
-						expect(leaveSpy1).toHaveBeenCalled();
-						expect(leaveSpy11).toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).toHaveBeenCalled();
-					});
+					simulation.leave($('#1112')).execute();
+					jasmine.clock().tick(1000);
+					expect(simulation.isRunning()).toBeFalsy();
+					expectSpiesToHaveBeenCalledExclusively([
+						moveSpy1,
+						moveSpy11,
+						moveSpy111,
+						moveSpy1112,
+						enterSpy1,
+						enterSpy11,
+						enterSpy111,
+						enterSpy1112,
+						leaveSpy1,
+						leaveSpy11,
+						leaveSpy111,
+						leaveSpy1112
+					], spies);
+					resetSpies(spies);
 				});
 				
 				it('should leave parent', function () {
-					runs(function () {
-						simulation.leave($('#1')).execute();
-					});
-					waitsFor(function () {
-						return !simulation.isRunning();
-					}, 'Simulation to finish', 2000);
-					runs(function () {
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).not.toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).not.toHaveBeenCalled();
-						expect(enterSpy11).not.toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).not.toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).toHaveBeenCalled();
-						expect(leaveSpy11).toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).not.toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-					});
+					simulation.leave($('#1')).execute();
+					jasmine.clock().tick(2000);
+					expect(simulation.isRunning()).toBeFalsy();
+					expectSpiesToHaveBeenCalledExclusively([
+						moveSpy1,
+						moveSpy11,
+						leaveSpy1,
+						leaveSpy11
+					], spies);
+					resetSpies(spies);
 				});
 				
 				it('should leave on element on different stack', function () {
-					runs(function () {
-						simulation.leave($('#121')).execute();
-					});
-					waitsFor(function () {
-						return !simulation.isRunning();
-					}, 'Simulation to finish', 1000);
-					runs(function () {
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).toHaveBeenCalled();
-						expect(moveSpy12).toHaveBeenCalled();
-						expect(moveSpy111).not.toHaveBeenCalled();
-						expect(moveSpy121).toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).toHaveBeenCalled();
-						expect(enterSpy11).not.toHaveBeenCalled();
-						expect(enterSpy12).toHaveBeenCalled();
-						expect(enterSpy111).not.toHaveBeenCalled();
-						expect(enterSpy121).toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).toHaveBeenCalled();
-						expect(leaveSpy11).toHaveBeenCalled();
-						expect(leaveSpy12).toHaveBeenCalled();
-						expect(leaveSpy111).not.toHaveBeenCalled();
-						expect(leaveSpy121).toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-					});
+					simulation.leave($('#121')).execute();
+					jasmine.clock().tick(1000);
+					expect(simulation.isRunning()).toBeFalsy();
+					expectSpiesToHaveBeenCalledExclusively([
+						moveSpy1,
+						moveSpy11,
+						moveSpy12,
+						moveSpy121,
+						enterSpy1,
+						enterSpy12,
+						enterSpy121,
+						leaveSpy1,
+						leaveSpy11,
+						leaveSpy12,
+						leaveSpy121
+					], spies);
+					resetSpies(spies);
 				});
 				
 			});
@@ -2725,145 +1974,42 @@ describe('jquery.simula', function () {
 				describe('mousedown', function () {
 					
 					it('should work with no arguments', function () {
-						runs(function () {
-							simulation.mousedown().execute();
-						});
-						waitsFor(function () {
-							return !simulation.isRunning();
-						}, 'Simulation to finish', 1000);
-						runs(function () {
-							expect(moveSpy1).not.toHaveBeenCalled();
-							expect(moveSpy11).not.toHaveBeenCalled();
-							expect(moveSpy12).not.toHaveBeenCalled();
-							expect(moveSpy111).not.toHaveBeenCalled();
-							expect(moveSpy121).not.toHaveBeenCalled();
-							expect(moveSpy1111).not.toHaveBeenCalled();
-							expect(moveSpy1112).not.toHaveBeenCalled();
-							expect(enterSpy1).not.toHaveBeenCalled();
-							expect(enterSpy11).not.toHaveBeenCalled();
-							expect(enterSpy12).not.toHaveBeenCalled();
-							expect(enterSpy111).not.toHaveBeenCalled();
-							expect(enterSpy121).not.toHaveBeenCalled();
-							expect(enterSpy1111).not.toHaveBeenCalled();
-							expect(enterSpy1112).not.toHaveBeenCalled();
-							expect(leaveSpy1).not.toHaveBeenCalled();
-							expect(leaveSpy11).not.toHaveBeenCalled();
-							expect(leaveSpy12).not.toHaveBeenCalled();
-							expect(leaveSpy111).not.toHaveBeenCalled();
-							expect(leaveSpy121).not.toHaveBeenCalled();
-							expect(leaveSpy1111).not.toHaveBeenCalled();
-							expect(leaveSpy1112).not.toHaveBeenCalled();
-							expect(pressSpy1).toHaveBeenCalled();
-							expect(pressSpy11).toHaveBeenCalled();
-							expect(pressSpy12).not.toHaveBeenCalled();
-							expect(pressSpy111).not.toHaveBeenCalled();
-							expect(pressSpy121).not.toHaveBeenCalled();
-							expect(pressSpy1111).not.toHaveBeenCalled();
-							expect(pressSpy1112).not.toHaveBeenCalled();
-							expect(releaseSpy1).not.toHaveBeenCalled();
-							expect(releaseSpy11).not.toHaveBeenCalled();
-							expect(releaseSpy12).not.toHaveBeenCalled();
-							expect(releaseSpy111).not.toHaveBeenCalled();
-							expect(releaseSpy121).not.toHaveBeenCalled();
-							expect(releaseSpy1111).not.toHaveBeenCalled();
-							expect(releaseSpy1112).not.toHaveBeenCalled();
-						});
+						simulation.mousedown().execute();
+						jasmine.clock().tick(1000);
+						expect(simulation.isRunning()).toBeFalsy();
+						expectSpiesToHaveBeenCalledExclusively([
+							pressSpy1,
+							pressSpy11
+						], spies);
+						resetSpies(spies);
 					});
 					
 					it('should work with $element argument', function () {
-						runs(function () {
-							simulation.mousedown($('#121')).execute();
-						});
-						waitsFor(function () {
-							return !simulation.isRunning();
-						}, 'Simulation to finish', 1000);
-						runs(function () {
-							expect(moveSpy1).not.toHaveBeenCalled();
-							expect(moveSpy11).not.toHaveBeenCalled();
-							expect(moveSpy12).not.toHaveBeenCalled();
-							expect(moveSpy111).not.toHaveBeenCalled();
-							expect(moveSpy121).not.toHaveBeenCalled();
-							expect(moveSpy1111).not.toHaveBeenCalled();
-							expect(moveSpy1112).not.toHaveBeenCalled();
-							expect(enterSpy1).not.toHaveBeenCalled();
-							expect(enterSpy11).not.toHaveBeenCalled();
-							expect(enterSpy12).not.toHaveBeenCalled();
-							expect(enterSpy111).not.toHaveBeenCalled();
-							expect(enterSpy121).not.toHaveBeenCalled();
-							expect(enterSpy1111).not.toHaveBeenCalled();
-							expect(enterSpy1112).not.toHaveBeenCalled();
-							expect(leaveSpy1).not.toHaveBeenCalled();
-							expect(leaveSpy11).not.toHaveBeenCalled();
-							expect(leaveSpy12).not.toHaveBeenCalled();
-							expect(leaveSpy111).not.toHaveBeenCalled();
-							expect(leaveSpy121).not.toHaveBeenCalled();
-							expect(leaveSpy1111).not.toHaveBeenCalled();
-							expect(leaveSpy1112).not.toHaveBeenCalled();
-							expect(pressSpy1).toHaveBeenCalled();
-							expect(pressSpy11).not.toHaveBeenCalled();
-							expect(pressSpy12).toHaveBeenCalled();
-							expect(pressSpy111).not.toHaveBeenCalled();
-							expect(pressSpy121).toHaveBeenCalled();
-							expect(pressSpy1111).not.toHaveBeenCalled();
-							expect(pressSpy1112).not.toHaveBeenCalled();
-							expect(releaseSpy1).not.toHaveBeenCalled();
-							expect(releaseSpy11).not.toHaveBeenCalled();
-							expect(releaseSpy12).not.toHaveBeenCalled();
-							expect(releaseSpy111).not.toHaveBeenCalled();
-							expect(releaseSpy121).not.toHaveBeenCalled();
-							expect(releaseSpy1111).not.toHaveBeenCalled();
-							expect(releaseSpy1112).not.toHaveBeenCalled();
-						});
+						simulation.mousedown($('#121')).execute();
+						jasmine.clock().tick(1000);
+						expect(simulation.isRunning()).toBeFalsy();
+						expectSpiesToHaveBeenCalledExclusively([
+							pressSpy1,
+							pressSpy12,
+							pressSpy121
+						], spies);
+						resetSpies(spies);
 					});
 					
 					it('should work with full arguments', function () {
-						runs(function () {
-							simulation.mousedown($('#121'), {
-								button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
-							}).execute();
-						});
-						waitsFor(function () {
-							return !simulation.isRunning();
-						}, 'Simulation to finish', 1000);
-						runs(function () {
-							expect(moveSpy1).not.toHaveBeenCalled();
-							expect(moveSpy11).not.toHaveBeenCalled();
-							expect(moveSpy12).not.toHaveBeenCalled();
-							expect(moveSpy111).not.toHaveBeenCalled();
-							expect(moveSpy121).not.toHaveBeenCalled();
-							expect(moveSpy1111).not.toHaveBeenCalled();
-							expect(moveSpy1112).not.toHaveBeenCalled();
-							expect(enterSpy1).not.toHaveBeenCalled();
-							expect(enterSpy11).not.toHaveBeenCalled();
-							expect(enterSpy12).not.toHaveBeenCalled();
-							expect(enterSpy111).not.toHaveBeenCalled();
-							expect(enterSpy121).not.toHaveBeenCalled();
-							expect(enterSpy1111).not.toHaveBeenCalled();
-							expect(enterSpy1112).not.toHaveBeenCalled();
-							expect(leaveSpy1).not.toHaveBeenCalled();
-							expect(leaveSpy11).not.toHaveBeenCalled();
-							expect(leaveSpy12).not.toHaveBeenCalled();
-							expect(leaveSpy111).not.toHaveBeenCalled();
-							expect(leaveSpy121).not.toHaveBeenCalled();
-							expect(leaveSpy1111).not.toHaveBeenCalled();
-							expect(leaveSpy1112).not.toHaveBeenCalled();
-							expect(pressSpy1).toHaveBeenCalled();
-							expect(pressSpy11).not.toHaveBeenCalled();
-							expect(pressSpy12).toHaveBeenCalled();
-							expect(pressSpy111).not.toHaveBeenCalled();
-							expect(pressSpy121).toHaveBeenCalled();
-							expect(pressSpy1111).not.toHaveBeenCalled();
-							expect(pressSpy1112).not.toHaveBeenCalled();
-							expect(releaseSpy1).not.toHaveBeenCalled();
-							expect(releaseSpy11).not.toHaveBeenCalled();
-							expect(releaseSpy12).not.toHaveBeenCalled();
-							expect(releaseSpy111).not.toHaveBeenCalled();
-							expect(releaseSpy121).not.toHaveBeenCalled();
-							expect(releaseSpy1111).not.toHaveBeenCalled();
-							expect(releaseSpy1112).not.toHaveBeenCalled();
-							var event = pressSpy121.mostRecentCall.args[0];
-							expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
-						});
+						simulation.mousedown($('#121'), {
+							button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
+						}).execute();
+						jasmine.clock().tick(1000);
+						expect(simulation.isRunning()).toBeFalsy();
+						expectSpiesToHaveBeenCalledExclusively([
+							pressSpy1,
+							pressSpy12,
+							pressSpy121
+						], spies);
+						var event = pressSpy121.calls.mostRecent().args[0];
+						expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
+						resetSpies(spies);
 					});
 					
 				});
@@ -2876,99 +2022,35 @@ describe('jquery.simula', function () {
 				});
 				
 				it('should press without argument', function () {
-					runs(function () {
-						simulation.press().execute();
-					});
-					waitsFor(function () {
-						return pressSpy11.callCount == 1;
-					}, 'pressSpy11 to be called', 1000);
-					runs(function () {
-						expect(moveSpy1).not.toHaveBeenCalled();
-						expect(moveSpy11).not.toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).not.toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).not.toHaveBeenCalled();
-						expect(enterSpy11).not.toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).not.toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).not.toHaveBeenCalled();
-						expect(leaveSpy11).not.toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).not.toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-						expect(pressSpy1).toHaveBeenCalled();
-						expect(pressSpy11).toHaveBeenCalled();
-						expect(pressSpy12).not.toHaveBeenCalled();
-						expect(pressSpy111).not.toHaveBeenCalled();
-						expect(pressSpy121).not.toHaveBeenCalled();
-						expect(pressSpy1111).not.toHaveBeenCalled();
-						expect(pressSpy1112).not.toHaveBeenCalled();
-						expect(releaseSpy1).not.toHaveBeenCalled();
-						expect(releaseSpy11).not.toHaveBeenCalled();
-						expect(releaseSpy12).not.toHaveBeenCalled();
-						expect(releaseSpy111).not.toHaveBeenCalled();
-						expect(releaseSpy121).not.toHaveBeenCalled();
-						expect(releaseSpy1111).not.toHaveBeenCalled();
-						expect(releaseSpy1112).not.toHaveBeenCalled();
-					});
+					simulation.press().execute();
+					jasmine.clock().tick(1000);
+					expect(pressSpy11.calls.count()).toEqual(1);
+					expectSpiesToHaveBeenCalledExclusively([
+						pressSpy1,
+						pressSpy11
+					], spies);
+					resetSpies(spies);
 				});
 				
 				it('should set options', function () {
-					runs(function () {
-						simulation.press($('#111'), {
-							button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
-						}).execute();
-					});
-					waitsFor(function () {
-						return pressSpy111.callCount == 1;
-					}, 'pressSpy111 to be called', 1000);
-					runs(function () {
-						var event = pressSpy111.mostRecentCall.args[0];
-						expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).not.toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).toHaveBeenCalled();
-						expect(enterSpy11).toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).not.toHaveBeenCalled();
-						expect(leaveSpy11).not.toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).not.toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-						expect(pressSpy1).toHaveBeenCalled();
-						expect(pressSpy11).toHaveBeenCalled();
-						expect(pressSpy12).not.toHaveBeenCalled();
-						expect(pressSpy111).toHaveBeenCalled();
-						expect(pressSpy121).not.toHaveBeenCalled();
-						expect(pressSpy1111).not.toHaveBeenCalled();
-						expect(pressSpy1112).not.toHaveBeenCalled();
-						expect(releaseSpy1).not.toHaveBeenCalled();
-						expect(releaseSpy11).not.toHaveBeenCalled();
-						expect(releaseSpy12).not.toHaveBeenCalled();
-						expect(releaseSpy111).not.toHaveBeenCalled();
-						expect(releaseSpy121).not.toHaveBeenCalled();
-						expect(releaseSpy1111).not.toHaveBeenCalled();
-						expect(releaseSpy1112).not.toHaveBeenCalled();
-					});
+					simulation.press($('#111'), {
+						button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
+					}).execute();
+					jasmine.clock().tick(1000);
+					expect(pressSpy111.calls.count()).toEqual(1);
+					var event = pressSpy111.calls.mostRecent().args[0];
+					expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
+					expectSpiesToHaveBeenCalledExclusively([
+						moveSpy1,
+						moveSpy11,
+						enterSpy1,
+						enterSpy11,
+						enterSpy111,
+						pressSpy1,
+						pressSpy11,
+						pressSpy111
+					], spies);
+					resetSpies(spies);
 				});
 				
 			});
@@ -2978,145 +2060,42 @@ describe('jquery.simula', function () {
 				describe('mouseup', function () {
 					
 					it('should work with no arguments', function () {
-						runs(function () {
-							simulation.mouseup().execute();
-						});
-						waitsFor(function () {
-							return !simulation.isRunning();
-						}, 'Simulation to finish', 1000);
-						runs(function () {
-							expect(moveSpy1).not.toHaveBeenCalled();
-							expect(moveSpy11).not.toHaveBeenCalled();
-							expect(moveSpy12).not.toHaveBeenCalled();
-							expect(moveSpy111).not.toHaveBeenCalled();
-							expect(moveSpy121).not.toHaveBeenCalled();
-							expect(moveSpy1111).not.toHaveBeenCalled();
-							expect(moveSpy1112).not.toHaveBeenCalled();
-							expect(enterSpy1).not.toHaveBeenCalled();
-							expect(enterSpy11).not.toHaveBeenCalled();
-							expect(enterSpy12).not.toHaveBeenCalled();
-							expect(enterSpy111).not.toHaveBeenCalled();
-							expect(enterSpy121).not.toHaveBeenCalled();
-							expect(enterSpy1111).not.toHaveBeenCalled();
-							expect(enterSpy1112).not.toHaveBeenCalled();
-							expect(leaveSpy1).not.toHaveBeenCalled();
-							expect(leaveSpy11).not.toHaveBeenCalled();
-							expect(leaveSpy12).not.toHaveBeenCalled();
-							expect(leaveSpy111).not.toHaveBeenCalled();
-							expect(leaveSpy121).not.toHaveBeenCalled();
-							expect(leaveSpy1111).not.toHaveBeenCalled();
-							expect(leaveSpy1112).not.toHaveBeenCalled();
-							expect(pressSpy1).not.toHaveBeenCalled();
-							expect(pressSpy11).not.toHaveBeenCalled();
-							expect(pressSpy12).not.toHaveBeenCalled();
-							expect(pressSpy111).not.toHaveBeenCalled();
-							expect(pressSpy121).not.toHaveBeenCalled();
-							expect(pressSpy1111).not.toHaveBeenCalled();
-							expect(pressSpy1112).not.toHaveBeenCalled();
-							expect(releaseSpy1).toHaveBeenCalled();
-							expect(releaseSpy11).toHaveBeenCalled();
-							expect(releaseSpy12).not.toHaveBeenCalled();
-							expect(releaseSpy111).not.toHaveBeenCalled();
-							expect(releaseSpy121).not.toHaveBeenCalled();
-							expect(releaseSpy1111).not.toHaveBeenCalled();
-							expect(releaseSpy1112).not.toHaveBeenCalled();
-						});
+						simulation.mouseup().execute();
+						jasmine.clock().tick(1000);
+						expect(simulation.isRunning()).toBeFalsy();
+						expectSpiesToHaveBeenCalledExclusively([
+							releaseSpy1,
+							releaseSpy11
+						], spies);
+						resetSpies(spies);
 					});
 					
 					it('should work with $element argument', function () {
-						runs(function () {
-							simulation.mouseup($('#121')).execute();
-						});
-						waitsFor(function () {
-							return !simulation.isRunning();
-						}, 'Simulation to finish', 1000);
-						runs(function () {
-							expect(moveSpy1).not.toHaveBeenCalled();
-							expect(moveSpy11).not.toHaveBeenCalled();
-							expect(moveSpy12).not.toHaveBeenCalled();
-							expect(moveSpy111).not.toHaveBeenCalled();
-							expect(moveSpy121).not.toHaveBeenCalled();
-							expect(moveSpy1111).not.toHaveBeenCalled();
-							expect(moveSpy1112).not.toHaveBeenCalled();
-							expect(enterSpy1).not.toHaveBeenCalled();
-							expect(enterSpy11).not.toHaveBeenCalled();
-							expect(enterSpy12).not.toHaveBeenCalled();
-							expect(enterSpy111).not.toHaveBeenCalled();
-							expect(enterSpy121).not.toHaveBeenCalled();
-							expect(enterSpy1111).not.toHaveBeenCalled();
-							expect(enterSpy1112).not.toHaveBeenCalled();
-							expect(leaveSpy1).not.toHaveBeenCalled();
-							expect(leaveSpy11).not.toHaveBeenCalled();
-							expect(leaveSpy12).not.toHaveBeenCalled();
-							expect(leaveSpy111).not.toHaveBeenCalled();
-							expect(leaveSpy121).not.toHaveBeenCalled();
-							expect(leaveSpy1111).not.toHaveBeenCalled();
-							expect(leaveSpy1112).not.toHaveBeenCalled();
-							expect(pressSpy1).not.toHaveBeenCalled();
-							expect(pressSpy11).not.toHaveBeenCalled();
-							expect(pressSpy12).not.toHaveBeenCalled();
-							expect(pressSpy111).not.toHaveBeenCalled();
-							expect(pressSpy121).not.toHaveBeenCalled();
-							expect(pressSpy1111).not.toHaveBeenCalled();
-							expect(pressSpy1112).not.toHaveBeenCalled();
-							expect(releaseSpy1).toHaveBeenCalled();
-							expect(releaseSpy11).not.toHaveBeenCalled();
-							expect(releaseSpy12).toHaveBeenCalled();
-							expect(releaseSpy111).not.toHaveBeenCalled();
-							expect(releaseSpy121).toHaveBeenCalled();
-							expect(releaseSpy1111).not.toHaveBeenCalled();
-							expect(releaseSpy1112).not.toHaveBeenCalled();
-						});
+						simulation.mouseup($('#121')).execute();
+						jasmine.clock().tick(1000);
+						expect(simulation.isRunning()).toBeFalsy();
+						expectSpiesToHaveBeenCalledExclusively([
+							releaseSpy1,
+							releaseSpy12,
+							releaseSpy121
+						], spies);
+						resetSpies(spies);
 					});
 					
 					it('should work with full arguments', function () {
-						runs(function () {
-							simulation.mouseup($('#121'), {
-								button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
-							}).execute();
-						});
-						waitsFor(function () {
-							return !simulation.isRunning();
-						}, 'Simulation to finish', 1000);
-						runs(function () {
-							expect(moveSpy1).not.toHaveBeenCalled();
-							expect(moveSpy11).not.toHaveBeenCalled();
-							expect(moveSpy12).not.toHaveBeenCalled();
-							expect(moveSpy111).not.toHaveBeenCalled();
-							expect(moveSpy121).not.toHaveBeenCalled();
-							expect(moveSpy1111).not.toHaveBeenCalled();
-							expect(moveSpy1112).not.toHaveBeenCalled();
-							expect(enterSpy1).not.toHaveBeenCalled();
-							expect(enterSpy11).not.toHaveBeenCalled();
-							expect(enterSpy12).not.toHaveBeenCalled();
-							expect(enterSpy111).not.toHaveBeenCalled();
-							expect(enterSpy121).not.toHaveBeenCalled();
-							expect(enterSpy1111).not.toHaveBeenCalled();
-							expect(enterSpy1112).not.toHaveBeenCalled();
-							expect(leaveSpy1).not.toHaveBeenCalled();
-							expect(leaveSpy11).not.toHaveBeenCalled();
-							expect(leaveSpy12).not.toHaveBeenCalled();
-							expect(leaveSpy111).not.toHaveBeenCalled();
-							expect(leaveSpy121).not.toHaveBeenCalled();
-							expect(leaveSpy1111).not.toHaveBeenCalled();
-							expect(leaveSpy1112).not.toHaveBeenCalled();
-							expect(pressSpy1).not.toHaveBeenCalled();
-							expect(pressSpy11).not.toHaveBeenCalled();
-							expect(pressSpy12).not.toHaveBeenCalled();
-							expect(pressSpy111).not.toHaveBeenCalled();
-							expect(pressSpy121).not.toHaveBeenCalled();
-							expect(pressSpy1111).not.toHaveBeenCalled();
-							expect(pressSpy1112).not.toHaveBeenCalled();
-							expect(releaseSpy1).toHaveBeenCalled();
-							expect(releaseSpy11).not.toHaveBeenCalled();
-							expect(releaseSpy12).toHaveBeenCalled();
-							expect(releaseSpy111).not.toHaveBeenCalled();
-							expect(releaseSpy121).toHaveBeenCalled();
-							expect(releaseSpy1111).not.toHaveBeenCalled();
-							expect(releaseSpy1112).not.toHaveBeenCalled();
-							var event = releaseSpy121.mostRecentCall.args[0];
-							expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
-						});
+						simulation.mouseup($('#121'), {
+							button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
+						}).execute();
+						jasmine.clock().tick(1000);
+						expect(simulation.isRunning()).toBeFalsy();
+						expectSpiesToHaveBeenCalledExclusively([
+							releaseSpy1,
+							releaseSpy12,
+							releaseSpy121
+						], spies);
+						var event = releaseSpy121.calls.mostRecent().args[0];
+						expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
+						resetSpies(spies);
 					});
 					
 				});
@@ -3129,99 +2108,35 @@ describe('jquery.simula', function () {
 				});
 				
 				it('should press without argument', function () {
-					runs(function () {
-						simulation.release().execute();
-					});
-					waitsFor(function () {
-						return releaseSpy11.callCount == 1;
-					}, 'releaseSpy11 to be called', 1000);
-					runs(function () {
-						expect(moveSpy1).not.toHaveBeenCalled();
-						expect(moveSpy11).not.toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).not.toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).not.toHaveBeenCalled();
-						expect(enterSpy11).not.toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).not.toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).not.toHaveBeenCalled();
-						expect(leaveSpy11).not.toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).not.toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-						expect(pressSpy1).not.toHaveBeenCalled();
-						expect(pressSpy11).not.toHaveBeenCalled();
-						expect(pressSpy12).not.toHaveBeenCalled();
-						expect(pressSpy111).not.toHaveBeenCalled();
-						expect(pressSpy121).not.toHaveBeenCalled();
-						expect(pressSpy1111).not.toHaveBeenCalled();
-						expect(pressSpy1112).not.toHaveBeenCalled();
-						expect(releaseSpy1).toHaveBeenCalled();
-						expect(releaseSpy11).toHaveBeenCalled();
-						expect(releaseSpy12).not.toHaveBeenCalled();
-						expect(releaseSpy111).not.toHaveBeenCalled();
-						expect(releaseSpy121).not.toHaveBeenCalled();
-						expect(releaseSpy1111).not.toHaveBeenCalled();
-						expect(releaseSpy1112).not.toHaveBeenCalled();
-					});
+					simulation.release().execute();
+					jasmine.clock().tick(1000);
+					expect(releaseSpy11.calls.count()).toEqual(1);
+					expectSpiesToHaveBeenCalledExclusively([
+						releaseSpy1,
+						releaseSpy11
+					], spies);
+					resetSpies(spies);
 				});
 				
 				it('should set options', function () {
-					runs(function () {
-						simulation.release($('#111'), {
-							button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
-						}).execute();
-					});
-					waitsFor(function () {
-						return releaseSpy111.callCount == 1;
-					}, 'releaseSpy111 to be called', 1000);
-					runs(function () {
-						var event = releaseSpy111.mostRecentCall.args[0];
-						expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).not.toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).toHaveBeenCalled();
-						expect(enterSpy11).toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).not.toHaveBeenCalled();
-						expect(leaveSpy11).not.toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).not.toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-						expect(pressSpy1).not.toHaveBeenCalled();
-						expect(pressSpy11).not.toHaveBeenCalled();
-						expect(pressSpy12).not.toHaveBeenCalled();
-						expect(pressSpy111).not.toHaveBeenCalled();
-						expect(pressSpy121).not.toHaveBeenCalled();
-						expect(pressSpy1111).not.toHaveBeenCalled();
-						expect(pressSpy1112).not.toHaveBeenCalled();
-						expect(releaseSpy1).toHaveBeenCalled();
-						expect(releaseSpy11).toHaveBeenCalled();
-						expect(releaseSpy12).not.toHaveBeenCalled();
-						expect(releaseSpy111).toHaveBeenCalled();
-						expect(releaseSpy121).not.toHaveBeenCalled();
-						expect(releaseSpy1111).not.toHaveBeenCalled();
-						expect(releaseSpy1112).not.toHaveBeenCalled();
-					});
+					simulation.release($('#111'), {
+						button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
+					}).execute();
+					jasmine.clock().tick(1000);
+					expect(releaseSpy111.calls.count()).toEqual(1);
+					var event = releaseSpy111.calls.mostRecent().args[0];
+					expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
+					expectSpiesToHaveBeenCalledExclusively([
+						moveSpy1,
+						moveSpy11,
+						enterSpy1,
+						enterSpy11,
+						enterSpy111,
+						releaseSpy1,
+						releaseSpy11,
+						releaseSpy111
+					], spies);
+					resetSpies(spies);
 				});
 				
 			});
@@ -3231,166 +2146,42 @@ describe('jquery.simula', function () {
 				describe('mouseclick', function () {
 					
 					it('should work with no arguments', function () {
-						runs(function () {
-							simulation.mouseclick().execute();
-						});
-						waitsFor(function () {
-							return !simulation.isRunning();
-						}, 'Simulation to finish', 1000);
-						runs(function () {
-							expect(moveSpy1).not.toHaveBeenCalled();
-							expect(moveSpy11).not.toHaveBeenCalled();
-							expect(moveSpy12).not.toHaveBeenCalled();
-							expect(moveSpy111).not.toHaveBeenCalled();
-							expect(moveSpy121).not.toHaveBeenCalled();
-							expect(moveSpy1111).not.toHaveBeenCalled();
-							expect(moveSpy1112).not.toHaveBeenCalled();
-							expect(enterSpy1).not.toHaveBeenCalled();
-							expect(enterSpy11).not.toHaveBeenCalled();
-							expect(enterSpy12).not.toHaveBeenCalled();
-							expect(enterSpy111).not.toHaveBeenCalled();
-							expect(enterSpy121).not.toHaveBeenCalled();
-							expect(enterSpy1111).not.toHaveBeenCalled();
-							expect(enterSpy1112).not.toHaveBeenCalled();
-							expect(leaveSpy1).not.toHaveBeenCalled();
-							expect(leaveSpy11).not.toHaveBeenCalled();
-							expect(leaveSpy12).not.toHaveBeenCalled();
-							expect(leaveSpy111).not.toHaveBeenCalled();
-							expect(leaveSpy121).not.toHaveBeenCalled();
-							expect(leaveSpy1111).not.toHaveBeenCalled();
-							expect(leaveSpy1112).not.toHaveBeenCalled();
-							expect(pressSpy1).not.toHaveBeenCalled();
-							expect(pressSpy11).not.toHaveBeenCalled();
-							expect(pressSpy12).not.toHaveBeenCalled();
-							expect(pressSpy111).not.toHaveBeenCalled();
-							expect(pressSpy121).not.toHaveBeenCalled();
-							expect(pressSpy1111).not.toHaveBeenCalled();
-							expect(pressSpy1112).not.toHaveBeenCalled();
-							expect(releaseSpy1).not.toHaveBeenCalled();
-							expect(releaseSpy11).not.toHaveBeenCalled();
-							expect(releaseSpy12).not.toHaveBeenCalled();
-							expect(releaseSpy111).not.toHaveBeenCalled();
-							expect(releaseSpy121).not.toHaveBeenCalled();
-							expect(releaseSpy1111).not.toHaveBeenCalled();
-							expect(releaseSpy1112).not.toHaveBeenCalled();
-							expect(clickSpy1).toHaveBeenCalled();
-							expect(clickSpy11).toHaveBeenCalled();
-							expect(clickSpy12).not.toHaveBeenCalled();
-							expect(clickSpy111).not.toHaveBeenCalled();
-							expect(clickSpy121).not.toHaveBeenCalled();
-							expect(clickSpy1111).not.toHaveBeenCalled();
-							expect(clickSpy1112).not.toHaveBeenCalled();
-						});
+						simulation.mouseclick().execute();
+						jasmine.clock().tick(1000);
+						expect(simulation.isRunning()).toBeFalsy();
+						expectSpiesToHaveBeenCalledExclusively([
+							clickSpy1,
+							clickSpy11
+						], spies);
+						resetSpies(spies);
 					});
 					
 					it('should work with $element argument', function () {
-						runs(function () {
-							simulation.mouseclick($('#121')).execute();
-						});
-						waitsFor(function () {
-							return !simulation.isRunning();
-						}, 'Simulation to finish', 1000);
-						runs(function () {
-							expect(moveSpy1).not.toHaveBeenCalled();
-							expect(moveSpy11).not.toHaveBeenCalled();
-							expect(moveSpy12).not.toHaveBeenCalled();
-							expect(moveSpy111).not.toHaveBeenCalled();
-							expect(moveSpy121).not.toHaveBeenCalled();
-							expect(moveSpy1111).not.toHaveBeenCalled();
-							expect(moveSpy1112).not.toHaveBeenCalled();
-							expect(enterSpy1).not.toHaveBeenCalled();
-							expect(enterSpy11).not.toHaveBeenCalled();
-							expect(enterSpy12).not.toHaveBeenCalled();
-							expect(enterSpy111).not.toHaveBeenCalled();
-							expect(enterSpy121).not.toHaveBeenCalled();
-							expect(enterSpy1111).not.toHaveBeenCalled();
-							expect(enterSpy1112).not.toHaveBeenCalled();
-							expect(leaveSpy1).not.toHaveBeenCalled();
-							expect(leaveSpy11).not.toHaveBeenCalled();
-							expect(leaveSpy12).not.toHaveBeenCalled();
-							expect(leaveSpy111).not.toHaveBeenCalled();
-							expect(leaveSpy121).not.toHaveBeenCalled();
-							expect(leaveSpy1111).not.toHaveBeenCalled();
-							expect(leaveSpy1112).not.toHaveBeenCalled();
-							expect(pressSpy1).not.toHaveBeenCalled();
-							expect(pressSpy11).not.toHaveBeenCalled();
-							expect(pressSpy12).not.toHaveBeenCalled();
-							expect(pressSpy111).not.toHaveBeenCalled();
-							expect(pressSpy121).not.toHaveBeenCalled();
-							expect(pressSpy1111).not.toHaveBeenCalled();
-							expect(pressSpy1112).not.toHaveBeenCalled();
-							expect(releaseSpy1).not.toHaveBeenCalled();
-							expect(releaseSpy11).not.toHaveBeenCalled();
-							expect(releaseSpy12).not.toHaveBeenCalled();
-							expect(releaseSpy111).not.toHaveBeenCalled();
-							expect(releaseSpy121).not.toHaveBeenCalled();
-							expect(releaseSpy1111).not.toHaveBeenCalled();
-							expect(releaseSpy1112).not.toHaveBeenCalled();
-							expect(clickSpy1).toHaveBeenCalled();
-							expect(clickSpy11).not.toHaveBeenCalled();
-							expect(clickSpy12).toHaveBeenCalled();
-							expect(clickSpy111).not.toHaveBeenCalled();
-							expect(clickSpy121).toHaveBeenCalled();
-							expect(clickSpy1111).not.toHaveBeenCalled();
-							expect(clickSpy1112).not.toHaveBeenCalled();
-						});
+						simulation.mouseclick($('#121')).execute();
+						jasmine.clock().tick(1000);
+						expect(simulation.isRunning()).toBeFalsy();
+						expectSpiesToHaveBeenCalledExclusively([
+							clickSpy1,
+							clickSpy12,
+							clickSpy121
+						], spies);
+						resetSpies(spies);
 					});
 					
 					it('should work with full arguments', function () {
-						runs(function () {
-							simulation.mouseclick($('#121'), {
-								button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
-							}).execute();
-						});
-						waitsFor(function () {
-							return !simulation.isRunning();
-						}, 'Simulation to finish', 1000);
-						runs(function () {
-							expect(moveSpy1).not.toHaveBeenCalled();
-							expect(moveSpy11).not.toHaveBeenCalled();
-							expect(moveSpy12).not.toHaveBeenCalled();
-							expect(moveSpy111).not.toHaveBeenCalled();
-							expect(moveSpy121).not.toHaveBeenCalled();
-							expect(moveSpy1111).not.toHaveBeenCalled();
-							expect(moveSpy1112).not.toHaveBeenCalled();
-							expect(enterSpy1).not.toHaveBeenCalled();
-							expect(enterSpy11).not.toHaveBeenCalled();
-							expect(enterSpy12).not.toHaveBeenCalled();
-							expect(enterSpy111).not.toHaveBeenCalled();
-							expect(enterSpy121).not.toHaveBeenCalled();
-							expect(enterSpy1111).not.toHaveBeenCalled();
-							expect(enterSpy1112).not.toHaveBeenCalled();
-							expect(leaveSpy1).not.toHaveBeenCalled();
-							expect(leaveSpy11).not.toHaveBeenCalled();
-							expect(leaveSpy12).not.toHaveBeenCalled();
-							expect(leaveSpy111).not.toHaveBeenCalled();
-							expect(leaveSpy121).not.toHaveBeenCalled();
-							expect(leaveSpy1111).not.toHaveBeenCalled();
-							expect(leaveSpy1112).not.toHaveBeenCalled();
-							expect(pressSpy1).not.toHaveBeenCalled();
-							expect(pressSpy11).not.toHaveBeenCalled();
-							expect(pressSpy12).not.toHaveBeenCalled();
-							expect(pressSpy111).not.toHaveBeenCalled();
-							expect(pressSpy121).not.toHaveBeenCalled();
-							expect(pressSpy1111).not.toHaveBeenCalled();
-							expect(pressSpy1112).not.toHaveBeenCalled();
-							expect(releaseSpy1).not.toHaveBeenCalled();
-							expect(releaseSpy11).not.toHaveBeenCalled();
-							expect(releaseSpy12).not.toHaveBeenCalled();
-							expect(releaseSpy111).not.toHaveBeenCalled();
-							expect(releaseSpy121).not.toHaveBeenCalled();
-							expect(releaseSpy1111).not.toHaveBeenCalled();
-							expect(releaseSpy1112).not.toHaveBeenCalled();
-							expect(clickSpy1).toHaveBeenCalled();
-							expect(clickSpy11).not.toHaveBeenCalled();
-							expect(clickSpy12).toHaveBeenCalled();
-							expect(clickSpy111).not.toHaveBeenCalled();
-							expect(clickSpy121).toHaveBeenCalled();
-							expect(clickSpy1111).not.toHaveBeenCalled();
-							expect(clickSpy1112).not.toHaveBeenCalled();
-							var event = clickSpy121.mostRecentCall.args[0];
-							expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
-						});
+						simulation.mouseclick($('#121'), {
+							button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
+						}).execute();
+						jasmine.clock().tick(1000);
+						expect(simulation.isRunning()).toBeFalsy();
+						expectSpiesToHaveBeenCalledExclusively([
+							clickSpy1,
+							clickSpy12,
+							clickSpy121
+						], spies);
+						var event = clickSpy121.calls.mostRecent().args[0];
+						expect(event.button).toEqual($.simula.SimulaMouseEvent.BUTTON.RIGHT);
+						resetSpies(spies);
 					});
 					
 				});
@@ -3403,114 +2194,46 @@ describe('jquery.simula', function () {
 				});
 				
 				it('should press without argument', function () {
-					runs(function () {
-						simulation.click().execute();
-					});
-					waitsFor(function () {
-						return clickSpy11.callCount == 1;
-					}, 'clickSpy11 to be called', 1000);
-					runs(function () {
-						expect(moveSpy1).not.toHaveBeenCalled();
-						expect(moveSpy11).not.toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).not.toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).not.toHaveBeenCalled();
-						expect(enterSpy11).not.toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).not.toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).not.toHaveBeenCalled();
-						expect(leaveSpy11).not.toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).not.toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-						expect(pressSpy1).toHaveBeenCalled();
-						expect(pressSpy11).toHaveBeenCalled();
-						expect(pressSpy12).not.toHaveBeenCalled();
-						expect(pressSpy111).not.toHaveBeenCalled();
-						expect(pressSpy121).not.toHaveBeenCalled();
-						expect(pressSpy1111).not.toHaveBeenCalled();
-						expect(pressSpy1112).not.toHaveBeenCalled();
-						expect(releaseSpy1).toHaveBeenCalled();
-						expect(releaseSpy11).toHaveBeenCalled();
-						expect(releaseSpy12).not.toHaveBeenCalled();
-						expect(releaseSpy111).not.toHaveBeenCalled();
-						expect(releaseSpy121).not.toHaveBeenCalled();
-						expect(releaseSpy1111).not.toHaveBeenCalled();
-						expect(releaseSpy1112).not.toHaveBeenCalled();
-						expect(clickSpy1).toHaveBeenCalled();
-						expect(clickSpy11).toHaveBeenCalled();
-						expect(clickSpy12).not.toHaveBeenCalled();
-						expect(clickSpy111).not.toHaveBeenCalled();
-						expect(clickSpy121).not.toHaveBeenCalled();
-						expect(clickSpy1111).not.toHaveBeenCalled();
-						expect(clickSpy1112).not.toHaveBeenCalled();
-					});
+					simulation.click().execute();
+					jasmine.clock().tick(1000);
+					expect(clickSpy11.calls.count()).toEqual(1);
+					expectSpiesToHaveBeenCalledExclusively([
+						pressSpy1,
+						pressSpy11,
+						releaseSpy1,
+						releaseSpy11,
+						clickSpy1,
+						clickSpy11
+					], spies);
+					resetSpies(spies);
 				});
 				
 				it('should set options', function () {
-					runs(function () {
-						simulation.click($('#111'), {
-							button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
-						}).execute();
-					});
-					waitsFor(function () {
-						return clickSpy111.callCount == 1;
-					}, 'clickSpy111 to be called', 1000);
-					runs(function () {
-						var event = clickSpy111.mostRecentCall.args[0];
-						expect(event.button).toEqual(
-								$.simula.SimulaMouseEvent.BUTTON.RIGHT);
-						expect(moveSpy1).toHaveBeenCalled();
-						expect(moveSpy11).toHaveBeenCalled();
-						expect(moveSpy12).not.toHaveBeenCalled();
-						expect(moveSpy111).not.toHaveBeenCalled();
-						expect(moveSpy121).not.toHaveBeenCalled();
-						expect(moveSpy1111).not.toHaveBeenCalled();
-						expect(moveSpy1112).not.toHaveBeenCalled();
-						expect(enterSpy1).toHaveBeenCalled();
-						expect(enterSpy11).toHaveBeenCalled();
-						expect(enterSpy12).not.toHaveBeenCalled();
-						expect(enterSpy111).toHaveBeenCalled();
-						expect(enterSpy121).not.toHaveBeenCalled();
-						expect(enterSpy1111).not.toHaveBeenCalled();
-						expect(enterSpy1112).not.toHaveBeenCalled();
-						expect(leaveSpy1).not.toHaveBeenCalled();
-						expect(leaveSpy11).not.toHaveBeenCalled();
-						expect(leaveSpy12).not.toHaveBeenCalled();
-						expect(leaveSpy111).not.toHaveBeenCalled();
-						expect(leaveSpy121).not.toHaveBeenCalled();
-						expect(leaveSpy1111).not.toHaveBeenCalled();
-						expect(leaveSpy1112).not.toHaveBeenCalled();
-						expect(pressSpy1).toHaveBeenCalled();
-						expect(pressSpy11).toHaveBeenCalled();
-						expect(pressSpy12).not.toHaveBeenCalled();
-						expect(pressSpy111).toHaveBeenCalled();
-						expect(pressSpy121).not.toHaveBeenCalled();
-						expect(pressSpy1111).not.toHaveBeenCalled();
-						expect(pressSpy1112).not.toHaveBeenCalled();
-						expect(releaseSpy1).toHaveBeenCalled();
-						expect(releaseSpy11).toHaveBeenCalled();
-						expect(releaseSpy12).not.toHaveBeenCalled();
-						expect(releaseSpy111).toHaveBeenCalled();
-						expect(releaseSpy121).not.toHaveBeenCalled();
-						expect(releaseSpy1111).not.toHaveBeenCalled();
-						expect(releaseSpy1112).not.toHaveBeenCalled();
-						expect(clickSpy1).toHaveBeenCalled();
-						expect(clickSpy11).toHaveBeenCalled();
-						expect(clickSpy12).not.toHaveBeenCalled();
-						expect(clickSpy111).toHaveBeenCalled();
-						expect(clickSpy121).not.toHaveBeenCalled();
-						expect(clickSpy1111).not.toHaveBeenCalled();
-						expect(clickSpy1112).not.toHaveBeenCalled();
-					});
+					simulation.click($('#111'), {
+						button: $.simula.SimulaMouseEvent.BUTTON.RIGHT
+					}).execute();
+					jasmine.clock().tick(1000);
+					expect(clickSpy111.calls.count()).toEqual(1);
+					var event = clickSpy111.calls.mostRecent().args[0];
+					expect(event.button).toEqual(
+							$.simula.SimulaMouseEvent.BUTTON.RIGHT);
+					expectSpiesToHaveBeenCalledExclusively([
+						moveSpy1,
+						moveSpy11,
+						enterSpy1,
+						enterSpy11,
+						enterSpy111,
+						pressSpy1,
+						pressSpy11,
+						pressSpy111,
+						releaseSpy1,
+						releaseSpy11,
+						releaseSpy111,
+						clickSpy1,
+						clickSpy11,
+						clickSpy111
+					], spies);
+					resetSpies(spies);
 				});
 				
 			});
